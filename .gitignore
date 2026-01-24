@@ -4,6 +4,9 @@ workspace/instructions.txt
 workspace/*.swp
 workspace/*.swo
 
+# User progress tracking
+progress.json
+
 # Python
 __pycache__/
 *.py[cod]

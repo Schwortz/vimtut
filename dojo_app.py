@@ -10,6 +10,7 @@ import json
 import curses
 import subprocess
 import time
+import argparse
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -21,9 +22,10 @@ class VimDojo:
         self.workspace_dir = self.base_dir / "workspace"
         self.vimrc_path = self.workspace_dir / ".vimrc"
         self.current_lesson_file = self.workspace_dir / "current_task.txt"
+        self.progress_file = self.base_dir / "progress.json"
 
         self.lessons = self.load_lessons()
-        self.completed_lessons = set()
+        self.completed_lessons = self.load_progress()
 
     def load_lessons(self) -> List[Dict]:
         """Load all lesson configurations from the lessons directory."""
@@ -39,6 +41,27 @@ class VimDojo:
             if lesson['id'] == lesson_id:
                 return lesson
         return None
+
+    def load_progress(self) -> set:
+        """Load user progress from file."""
+        if self.progress_file.exists():
+            try:
+                with open(self.progress_file, 'r') as f:
+                    data = json.load(f)
+                    return set(data.get('completed_lessons', []))
+            except (json.JSONDecodeError, IOError):
+                return set()
+        return set()
+
+    def save_progress(self):
+        """Save user progress to file."""
+        data = {
+            'completed_lessons': list(self.completed_lessons),
+            'total_lessons': len(self.lessons),
+            'completion_percentage': int((len(self.completed_lessons) / len(self.lessons)) * 100)
+        }
+        with open(self.progress_file, 'w') as f:
+            json.dump(data, f, indent=2)
 
     def setup_lesson(self, lesson: Dict):
         """Prepare the workspace for a lesson."""
@@ -157,11 +180,16 @@ class VimDojo:
         # Title
         title = "[ VIM DOJO ]"
         stdscr.addstr(0, (width - len(title)) // 2, title, curses.A_BOLD)
-        stdscr.addstr(1, 0, "-" * width)
+
+        # Progress bar
+        progress_pct = int((len(self.completed_lessons) / len(self.lessons)) * 100)
+        progress_text = f"Progress: {len(self.completed_lessons)}/{len(self.lessons)} ({progress_pct}%)"
+        stdscr.addstr(1, (width - len(progress_text)) // 2, progress_text)
+        stdscr.addstr(2, 0, "-" * width)
 
         # Lessons
         for idx, lesson in enumerate(self.lessons):
-            y = 3 + idx
+            y = 4 + idx
             completed = lesson['id'] in self.completed_lessons
             checkbox = "[x]" if completed else "[ ]"
             prefix = f"{checkbox} {idx + 1}. "
@@ -174,7 +202,7 @@ class VimDojo:
                 stdscr.addstr(y, 2, lesson_text)
 
         # Instructions
-        y = 5 + len(self.lessons)
+        y = 6 + len(self.lessons)
         stdscr.addstr(y, 0, "-" * width)
         stdscr.addstr(y + 1, 2, "Press ENTER to start lesson")
         stdscr.addstr(y + 2, 2, "Press 'q' to quit")
@@ -275,6 +303,11 @@ class VimDojo:
 
             if success:
                 self.completed_lessons.add(lesson['id'])
+                self.save_progress()
+
+                # Check if all lessons are complete
+                if len(self.completed_lessons) == len(self.lessons):
+                    self.show_completion_celebration(stdscr)
                 break
             elif not should_retry:
                 # User chose to return to menu without completing
@@ -302,14 +335,83 @@ class VimDojo:
                 lesson = self.lessons[selected_idx]
                 self.run_lesson(stdscr, lesson)
 
+    def show_completion_celebration(self, stdscr):
+        """Show a celebration screen when all lessons are complete."""
+        stdscr.clear()
+        height, width = stdscr.getmaxyx()
+
+        # ASCII art celebration
+        celebration = [
+            "",
+            "  ██████╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗██╗",
+            " ██╔════╝██╔═══██╗████╗  ██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██║",
+            " ██║     ██║   ██║██╔██╗ ██║██║  ███╗██████╔╝███████║   ██║   ███████╗██║",
+            " ██║     ██║   ██║██║╚██╗██║██║   ██║██╔══██╗██╔══██║   ██║   ╚════██║╚═╝",
+            " ╚██████╗╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║██║  ██║   ██║   ███████║██╗",
+            "  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝",
+            "",
+            "                     🎉  YOU'VE MASTERED VIM!  🎉",
+            "",
+            "                You've completed all 20 lessons!",
+            "",
+            "                   You are now a Vim master.",
+            "                 Go forth and edit with power!",
+            "",
+            "                         ⚡ ⚡ ⚡",
+            "",
+        ]
+
+        # Center and display celebration
+        start_y = max(0, (height - len(celebration)) // 2)
+        for idx, line in enumerate(celebration):
+            if start_y + idx < height:
+                x = max(0, (width - len(line)) // 2)
+                try:
+                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                except curses.error:
+                    pass  # Ignore if line doesn't fit
+
+        # Add footer
+        footer = "Press any key to return to menu"
+        stdscr.addstr(height - 2, (width - len(footer)) // 2, footer)
+
+        stdscr.refresh()
+        stdscr.getch()
+
     def run(self):
         """Start the Vim Dojo application."""
         curses.wrapper(self.main_loop)
 
 
 def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description='Vim Dojo - Interactive Vim Tutorial',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  ./dojo_app.py                  Run normally
+  ./dojo_app.py --progress 5     Fake completion of first 5 lessons
+  ./dojo_app.py --progress 20    Fake completion of all 20 lessons (see celebration!)
+  ./dojo_app.py --reset          Reset all progress
+        """
+    )
+    parser.add_argument(
+        '--progress',
+        type=int,
+        metavar='N',
+        help='Fake completion of first N lessons (for testing)'
+    )
+    parser.add_argument(
+        '--reset',
+        action='store_true',
+        help='Reset all progress and start fresh'
+    )
+
+    args = parser.parse_args()
+
+    # Check if vim is available
     if not os.path.exists('vim'):
-        # Check if vim is available
         result = subprocess.run(['which', 'vim'], capture_output=True)
         if result.returncode != 0:
             print("Error: Vim is not installed or not in PATH.")
@@ -317,6 +419,40 @@ def main():
             sys.exit(1)
 
     dojo = VimDojo()
+
+    # Handle --reset flag
+    if args.reset:
+        if dojo.progress_file.exists():
+            os.remove(dojo.progress_file)
+            print("✓ Progress reset! All lessons marked as incomplete.")
+        else:
+            print("✓ No progress file found. Starting fresh.")
+        sys.exit(0)
+
+    # Handle --progress flag
+    if args.progress is not None:
+        n = args.progress
+        if n < 0:
+            print(f"Error: --progress value must be positive (got {n})")
+            sys.exit(1)
+        if n > len(dojo.lessons):
+            print(f"Warning: --progress {n} exceeds total lessons ({len(dojo.lessons)})")
+            print(f"Setting progress to {len(dojo.lessons)} instead.")
+            n = len(dojo.lessons)
+
+        # Mark first N lessons as complete
+        dojo.completed_lessons = set(lesson['id'] for lesson in dojo.lessons[:n])
+        dojo.save_progress()
+
+        print(f"✓ Faked completion of first {n} lessons!")
+        print(f"  Progress: {n}/{len(dojo.lessons)} ({int((n/len(dojo.lessons))*100)}%)")
+
+        if n == len(dojo.lessons):
+            print("\n🎉 All lessons marked complete! Launch the app to see the celebration!")
+
+        sys.exit(0)
+
+    # Run normally
     dojo.run()
 
 

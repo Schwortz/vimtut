@@ -1,0 +1,8 @@
+{
+  "id": "07_delete_line",
+  "title": "Delete Line (dd)",
+  "instruction_text": "Delete entire lines with 'dd'!\n\nYour task: Remove the lines with uppercase text.\n\nSteps:\n1. Move cursor to the 'DELETE ME' line\n2. Press 'dd' (deletes entire line)\n3. Move to 'REMOVE THIS' line\n4. Press 'dd' again\n5. Save and quit with :wq\n\nResult should be just:\nApple\nBanana\nCherry",
+  "setup_file": "Apple\nDELETE ME\nBanana\nREMOVE THIS\nCherry",
+  "validation_type": "exact_match",
+  "target_content": "Apple\nBanana\nCherry"
+}

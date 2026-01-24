@@ -29,6 +29,27 @@ vimtut/
 - Python 3.6+
 - Vim (must be installed and in PATH)
 
+## Testing
+
+Run the test suites to verify validation logic:
+
+```bash
+python3 test_validation.py   # Test validation logic
+python3 test_lessons.py       # Test lesson content
+```
+
+All tests should pass before using the application.
+
+## Debugging
+
+If a lesson validation seems incorrect, use the debug tool:
+
+```bash
+python3 debug_validation.py
+```
+
+This shows byte-by-byte comparison of expected vs actual content.
+
 ## Usage
 
 Run the tutorial:
@@ -45,9 +66,14 @@ python3 dojo_app.py
 
 ## Controls
 
-- **UP/DOWN arrows**: Navigate lessons
+### Main Menu
+- **UP/DOWN arrows** or **j/k**: Navigate lessons (Vim-style!)
 - **ENTER**: Start selected lesson
 - **q**: Quit application
+
+### During Lessons
+- **ESC** or **q**: Exit lesson and return to menu (at briefing or after failure)
+- **ENTER**: Continue to next step or retry
 
 ## Adding New Lessons
 

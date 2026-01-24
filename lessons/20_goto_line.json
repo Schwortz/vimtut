@@ -1,0 +1,8 @@
+{
+  "id": "20_goto_line",
+  "title": "Go to Line (gg, G, :number)",
+  "instruction_text": "Jump to any line instantly!\n\n'gg' = go to first line\n'G'  = go to last line\n':5' then ENTER = go to line 5\n\nYour task: Delete lines 3, 5, and 7.\n\nSteps:\n1. Type ':3' and press ENTER (jumps to line 3)\n2. Press 'dd' to delete it\n3. Type ':4' and press ENTER (was line 5, now line 4)\n4. Press 'dd'\n5. Type ':5' and press ENTER (was line 7, now line 5)\n6. Press 'dd'\n7. Save and quit with :wq\n\nTry 'gg' and 'G' to jump to top/bottom!",
+  "setup_file": "Line 1\nLine 2\nDELETE 3\nLine 4\nDELETE 5\nLine 6\nDELETE 7\nLine 8\nLine 9\nLine 10",
+  "validation_type": "exact_match",
+  "target_content": "Line 1\nLine 2\nLine 4\nLine 6\nLine 8\nLine 9\nLine 10"
+}

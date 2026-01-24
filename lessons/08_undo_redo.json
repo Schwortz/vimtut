@@ -1,0 +1,8 @@
+{
+  "id": "08_undo_redo",
+  "title": "Undo and Redo (u, Ctrl-r)",
+  "instruction_text": "Made a mistake? No problem!\n\n'u' = undo last change\nCtrl-r = redo (undo the undo)\n\nYour task:\n1. Delete the word 'DELETE' using 'x' (5 times) or 'dw'\n2. Press 'u' to undo the deletion\n3. The word should reappear!\n4. Save and quit with :wq\n\nThe file should end with 'DELETE' still in it.",
+  "setup_file": "Keep this DELETE text here",
+  "validation_type": "exact_match",
+  "target_content": "Keep this DELETE text here"
+}

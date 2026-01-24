@@ -1,0 +1,8 @@
+{
+  "id": "06_delete_char",
+  "title": "Delete Character (x)",
+  "instruction_text": "The 'x' key deletes the character under the cursor.\n\nYour task: Fix the text by removing extra letters.\n\nCurrent: \"Helllllo Worrrlld\"\nGoal:    \"Hello World\"\n\nSteps:\n1. Navigate to the extra 'l' characters in 'Helllllo'\n2. Press 'x' repeatedly to delete them (or hold it down)\n3. Navigate to the extra 'r' characters in 'Worrrlld'\n4. Press 'x' to delete extra letters\n5. Save and quit with :wq",
+  "setup_file": "Helllllo Worrrlld",
+  "validation_type": "exact_match",
+  "target_content": "Hello World"
+}

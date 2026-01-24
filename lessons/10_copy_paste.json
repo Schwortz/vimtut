@@ -1,0 +1,8 @@
+{
+  "id": "10_copy_paste",
+  "title": "Copy and Paste Line (yy, p)",
+  "instruction_text": "Copy and paste like a pro!\n\n'yy' = yank (copy) the current line\n'p'  = paste below the current line\n\nYour task: Duplicate 'Copy this line'\n\nSteps:\n1. Move cursor to the 'Copy this line' line\n2. Press 'yy' (copies the line)\n3. Press 'p' (pastes below)\n4. Save and quit with :wq\n\nResult:\nLine 1\nCopy this line\nCopy this line\nLine 3",
+  "setup_file": "Line 1\nCopy this line\nLine 3",
+  "validation_type": "exact_match",
+  "target_content": "Line 1\nCopy this line\nCopy this line\nLine 3"
+}

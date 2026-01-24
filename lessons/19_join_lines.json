@@ -1,0 +1,8 @@
+{
+  "id": "19_join_lines",
+  "title": "Join Lines (J)",
+  "instruction_text": "Combine two lines into one!\n\n'J' = join current line with the line below\n\nYour task: Join 'Hello' and 'World' into one line.\n\nSteps:\n1. Move cursor to 'Hello' line (first line)\n2. Press 'J' (capital J)\n3. Vim automatically adds a space between words\n4. Save and quit with :wq\n\nResult: \"Hello World\" on one line",
+  "setup_file": "Hello\nWorld",
+  "validation_type": "exact_match",
+  "target_content": "Hello World"
+}

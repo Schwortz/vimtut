@@ -1,0 +1,8 @@
+{
+  "id": "04_append_mode",
+  "title": "Append Mode (a, A)",
+  "instruction_text": "Learn to append text with 'a' and 'A'!\n\n'a' = append after cursor\n'A' = append at end of line (super useful!)\n\nYour task: Add ' World' to the end of each line.\n\nSteps:\n1. Move to first line (use 'k' if needed)\n2. Press 'A' to jump to end of line and enter insert mode\n3. Type ' World'\n4. Press ESC\n5. Press 'j' to move to next line\n6. Repeat: Press 'A', type ' World', press ESC\n7. Save and quit with :wq",
+  "setup_file": "Hello\nGoodbye",
+  "validation_type": "exact_match",
+  "target_content": "Hello World\nGoodbye World"
+}

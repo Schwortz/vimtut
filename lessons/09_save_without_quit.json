@@ -1,0 +1,8 @@
+{
+  "id": "09_save_without_quit",
+  "title": "Save Without Quitting (:w)",
+  "instruction_text": "You don't always want to quit when saving!\n\n:w  = save (write) the file\n:wq = save and quit\n\nYour task:\n1. Press 'A' to append at end of line\n2. Type ' - edited'\n3. Press ESC\n4. Type :w and press ENTER (file saves, Vim stays open)\n5. Verify the status line shows the save\n6. Type :q and press ENTER to quit\n\nNote: You can also use :wq as usual.",
+  "setup_file": "Practice saving without quitting",
+  "validation_type": "contains",
+  "target_content": "edited"
+}

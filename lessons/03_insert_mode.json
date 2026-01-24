@@ -1,0 +1,8 @@
+{
+  "id": "03_insert_mode",
+  "title": "Insert Mode Basics (i)",
+  "instruction_text": "Time to add text! Press 'i' to enter INSERT mode.\n\nYour task: Add the word 'brown' to the sentence.\n\nCurrent: \"The quick fox jumps over the lazy dog.\"\nGoal:    \"The quick brown fox jumps over the lazy dog.\"\n\nSteps:\n1. Use 'l' to move cursor to the space after 'quick'\n2. Press 'i' to enter insert mode\n3. Type 'brown '\n4. Press ESC to return to normal mode\n5. Save and quit with :wq",
+  "setup_file": "The quick fox jumps over the lazy dog.",
+  "validation_type": "exact_match",
+  "target_content": "The quick brown fox jumps over the lazy dog."
+}

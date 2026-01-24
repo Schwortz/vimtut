@@ -48,6 +48,18 @@ class VimDojo:
         # Store the initial modification time
         self.file_mtime_before = os.path.getmtime(self.current_lesson_file)
 
+        # Create instructions file for Vim split view (only if lesson has full metadata)
+        if 'title' in lesson and 'instruction_text' in lesson:
+            instructions_file = self.workspace_dir / "instructions.txt"
+            with open(instructions_file, 'w') as f:
+                f.write("=" * 70 + "\n")
+                f.write(f"LESSON: {lesson['title']}\n")
+                f.write("=" * 70 + "\n")
+                f.write(lesson['instruction_text'])
+                f.write("\n" + "=" * 70 + "\n")
+                f.write("This pane is READ-ONLY. Edit in the pane above.\n")
+                f.write("=" * 70 + "\n")  # Add trailing newline to avoid "Incomplete last line"
+
     def launch_vim(self):
         """Launch Vim with the tutorial configuration."""
         # Save terminal state
@@ -180,9 +192,21 @@ class VimDojo:
         stdscr.addstr(0, (width - len(title)) // 2, title, curses.A_BOLD)
         stdscr.addstr(1, 0, "=" * width)
 
-        # Instructions
-        lines = lesson['instruction_text'].split('\n')
-        for idx, line in enumerate(lines):
+        # Simple message
+        msg_lines = [
+            "",
+            "Instructions will appear in a split pane inside Vim.",
+            "",
+            "The instructions are in the BOTTOM pane (read-only).",
+            "Your editable file is in the TOP pane.",
+            "",
+            "Use Ctrl+j to move to instructions pane.",
+            "Use Ctrl+k to move back to edit pane.",
+            "",
+            "Save and quit with :wq when done.",
+        ]
+
+        for idx, line in enumerate(msg_lines):
             if idx + 3 < height - 5:
                 stdscr.addstr(idx + 3, 2, line)
 
@@ -237,22 +261,16 @@ class VimDojo:
         return True
 
     def run_lesson(self, stdscr, lesson: Dict):
-        """Execute the full lesson cycle: briefing -> vim -> verification -> debrief."""
+        """Execute the full lesson cycle: vim -> verification -> debrief."""
         while True:
-            # 1. Briefing
-            should_continue = self.draw_briefing(stdscr, lesson)
-            if not should_continue:
-                # User pressed ESC or 'q' to abort
-                break
-
-            # 2. Setup and launch Vim
+            # 1. Setup and launch Vim directly (no briefing screen)
             self.setup_lesson(lesson)
             stdscr = self.launch_vim()
 
-            # 3. Validation
+            # 2. Validation
             success, message = self.validate_lesson(lesson)
 
-            # 4. Debrief
+            # 3. Debrief
             should_retry = self.draw_debrief(stdscr, success, message)
 
             if success:

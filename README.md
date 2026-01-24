@@ -6,10 +6,20 @@ An interactive TUI application that teaches Vim through hands-on lessons.
 
 Vim Dojo follows a "wrapper loop" pattern:
 
-1. **Briefing (TUI)**: Shows lesson objectives and instructions
-2. **Action (Vim)**: Launches real Vim for hands-on practice
+1. **Briefing (TUI)**: Quick overview before launching Vim
+2. **Action (Vim)**: Launches real Vim with split-screen instructions
+   - Top pane: Your editable file
+   - Bottom pane: Read-only instructions (always visible!)
 3. **Verification**: Validates the lesson completion when user exits Vim
 4. **Debrief (TUI)**: Shows results and feedback
+
+## Split Screen Feature
+
+Instructions appear **inside Vim** as a bottom split pane:
+- Instructions are always visible while you work
+- Bottom pane is read-only (can't accidentally edit)
+- Use **Ctrl+j** to view instructions, **Ctrl+k** to return to editing
+- Immersive learning experience - everything in Vim!
 
 ## Directory Structure
 
@@ -71,9 +81,15 @@ python3 dojo_app.py
 - **ENTER**: Start selected lesson
 - **q**: Quit application
 
-### During Lessons
+### During Lessons (in TUI)
 - **ESC** or **q**: Exit lesson and return to menu (at briefing or after failure)
 - **ENTER**: Continue to next step or retry
+
+### Inside Vim (during lesson)
+- **Ctrl+j**: Move to instructions pane (bottom)
+- **Ctrl+k**: Move back to edit pane (top)
+- **:wq**: Save and quit (complete lesson)
+- **:q!**: Quit without saving (lesson will fail)
 
 ## Adding New Lessons
 

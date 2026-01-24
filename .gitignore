@@ -1,0 +1,27 @@
+# Vim Dojo workspace files
+workspace/current_task.txt
+workspace/*.swp
+workspace/*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

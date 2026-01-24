@@ -1,0 +1,8 @@
+{
+  "id": "01_the_exit",
+  "title": "The Exit",
+  "instruction_text": "Welcome to Vim Dojo! Your first task is simple:\n\nJust quit Vim using the command :wq\n\nPress 'Escape' to ensure you're in Normal mode,\nthen type :wq and press Enter.",
+  "setup_file": "",
+  "validation_type": "file_saved",
+  "target_content": ""
+}

@@ -14,8 +14,11 @@ syntax on
 set laststatus=2
 set statusline=\ VIM\ DOJO\ \|\ Press\ ESC\ then\ :wq\ to\ save\ and\ quit
 
-" Don't show mode in command line (we have statusline)
-set noshowmode
+" Show the current mode (INSERT, VISUAL, etc.)
+set showmode
+
+" Make backspace work as expected in insert mode
+set backspace=indent,eol,start
 
 " Reduce startup messages
 set shortmess+=I    " Don't show intro message

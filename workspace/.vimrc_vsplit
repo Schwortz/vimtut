@@ -34,16 +34,21 @@ augroup VimtutSetup
   autocmd VimEnter * call SetupVimtutVertical()
 augroup END
 
-function! DojoQuit(save)
-  " Custom quit function for Vimtut
-  " a:save = 1 means save before quit (:wq), 0 means just quit (:q)
-  if a:save
-    " Save current file first
-    write
+" Intercept all quit commands and quit all windows instead
+let g:vimtut_quitting = 0
+
+function! VimtutQuitHandler()
+  if g:vimtut_quitting
+    return
   endif
-  " Then quit all windows
-  qall
+  let g:vimtut_quitting = 1
+  qall!
 endfunction
+
+augroup VimtutQuit
+  autocmd!
+  autocmd QuitPre * call VimtutQuitHandler()
+augroup END
 
 function! SetupVimtutVertical()
   " Save the current file name (the task file)
@@ -109,12 +114,6 @@ function! SetupVimtutVertical()
     " Redraw to ensure clean display
     redraw!
 
-    " Remap :q and :wq to close all windows
-    " :wq saves current file then quits all
-    " :q just quits all
-    cnoreabbrev <expr> q getcmdtype() == ':' && getcmdline() == 'q' ? 'call DojoQuit(0)' : 'q'
-    cnoreabbrev <expr> wq getcmdtype() == ':' && getcmdline() == 'wq' ? 'call DojoQuit(1)' : 'wq'
-    cnoreabbrev <expr> x getcmdtype() == ':' && getcmdline() == 'x' ? 'call DojoQuit(1)' : 'x'
   endif
 endfunction
 

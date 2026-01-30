@@ -298,7 +298,7 @@ class Vimtut:
         basic_ids = set(lesson['id'] for lesson in self.basic_lessons)
         return basic_ids.issubset(self.completed_lessons)
 
-    def draw_menu(self, stdscr, selected_idx: int):
+    def draw_menu(self, stdscr, selected_idx: int, count_buffer: str = "", pending_g: bool = False):
         """Draw the main lesson menu."""
         stdscr.clear()
         height, width = stdscr.getmaxyx()
@@ -344,13 +344,20 @@ class Vimtut:
         stdscr.addstr(y, 0, "-" * width)
         stdscr.addstr(y + 1, 2, "Press ENTER to start lesson")
         stdscr.addstr(y + 2, 2, "Press 'q' to quit")
-        stdscr.addstr(y + 3, 2, "Use UP/DOWN arrows or j/k to navigate")
+        stdscr.addstr(y + 3, 2, "j/k to navigate, gg/G to jump, {N}gg to go to line N")
 
         # Show mode switch option
         if self.current_mode == 'basic' and self.all_basic_lessons_complete():
             stdscr.addstr(y + 4, 2, "Press 'a' to access ADVANCED lessons", curses.A_BOLD)
         elif self.current_mode == 'advanced':
             stdscr.addstr(y + 4, 2, "Press 'b' to return to BASIC lessons")
+
+        # Show count buffer if user is typing a number
+        if count_buffer or pending_g:
+            indicator = count_buffer
+            if pending_g:
+                indicator += "g"
+            stdscr.addstr(height - 1, 0, f":{indicator}", curses.A_BOLD)
 
         stdscr.refresh()
 
@@ -481,19 +488,71 @@ class Vimtut:
             # Always clean up lesson files
             self.cleanup_lesson(lesson)
 
+    def handle_goto_key(self, key: int, count_buffer: str, pending_g: bool, max_idx: int) -> tuple:
+        """Handle Vim-style goto line input (gg, G, {N}gg, {N}G).
+        
+        Returns: (handled, new_count_buffer, new_pending_g, target_idx or None)
+        - handled: True if this key was consumed by goto logic
+        - target_idx: The line to jump to, or None if no jump yet
+        """
+        # Handle digit input (0-9) - accumulate for count prefix
+        if ord('0') <= key <= ord('9'):
+            # Don't allow leading zeros
+            if count_buffer or key != ord('0'):
+                count_buffer += chr(key)
+            return (True, count_buffer, False, None)
+
+        # Handle 'g' key - first 'g' sets pending, second 'g' executes goto
+        if key == ord('g'):
+            if pending_g:
+                # Second 'g' - execute goto
+                if count_buffer:
+                    target = int(count_buffer) - 1  # 1-indexed to 0-indexed
+                    target = max(0, min(target, max_idx))
+                else:
+                    target = 0  # No count - go to first line
+                return (True, "", False, target)
+            else:
+                # First 'g' - wait for second 'g'
+                return (True, count_buffer, True, None)
+
+        # Handle 'G' key - goto line N or last line
+        if key == ord('G'):
+            if count_buffer:
+                target = int(count_buffer) - 1  # 1-indexed to 0-indexed
+                target = max(0, min(target, max_idx))
+            else:
+                target = max_idx  # No count - go to last line
+            return (True, "", False, target)
+
+        # Key not handled by goto logic - clear state
+        return (False, "", False, None)
+
     def main_loop(self, stdscr):
         """Main TUI loop."""
         curses.curs_set(0)
         stdscr.keypad(True)
 
         selected_idx = 0
+        count_buffer = ""  # Accumulates digits for count prefix (e.g., "15" in "15gg")
+        pending_g = False  # True if 'g' was pressed, waiting for second 'g'
 
         while True:
             current_lessons = self.basic_lessons if self.current_mode == 'basic' else self.advanced_lessons
+            max_idx = len(current_lessons) - 1
 
-            self.draw_menu(stdscr, selected_idx)
+            self.draw_menu(stdscr, selected_idx, count_buffer, pending_g)
 
             key = stdscr.getch()
+
+            # Handle Vim-style goto line navigation
+            handled, count_buffer, pending_g, target_idx = self.handle_goto_key(
+                key, count_buffer, pending_g, max_idx
+            )
+            if handled:
+                if target_idx is not None:
+                    selected_idx = target_idx
+                continue
 
             if key == ord('q') or key == ord('Q'):
                 break
@@ -507,10 +566,10 @@ class Vimtut:
                 if self.current_mode == 'advanced':
                     self.current_mode = 'basic'
                     selected_idx = 0
-            elif key == curses.KEY_UP or key == ord('k') or key == ord('K'):
+            elif key == curses.KEY_UP or key == ord('k'):
                 selected_idx = max(0, selected_idx - 1)
-            elif key == curses.KEY_DOWN or key == ord('j') or key == ord('J'):
-                selected_idx = min(len(current_lessons) - 1, selected_idx + 1)
+            elif key == curses.KEY_DOWN or key == ord('j'):
+                selected_idx = min(max_idx, selected_idx + 1)
             elif key == ord('\n') or key == curses.KEY_ENTER:
                 if selected_idx < len(current_lessons):
                     lesson = current_lessons[selected_idx]

@@ -606,6 +606,10 @@ class Vimtut:
                     self.save_progress()
                     curses.curs_set(0)  # Hide cursor
                     return
+                elif input_buffer in ["quit", "q", "Q"]:
+                    self.welcome_seen = True
+                    self.save_progress()
+                    sys.exit(0)
                 else:
                     input_buffer = ""  # Clear and try again
             elif key == 27:  # ESC - clear input

@@ -104,10 +104,141 @@ class TestLessonContent(unittest.TestCase):
                          f"Lesson {lesson['id']} has invalid validation_type: {validation_type}")
 
 
+class TestLessonLinkedList(unittest.TestCase):
+    """Test the linked list structure of lessons."""
+
+    def setUp(self):
+        """Load all lessons."""
+        self.dojo = VimDojo()
+
+    def _load_all_lessons_raw(self, directory):
+        """Load all lesson files from a directory into a dict by ID."""
+        lessons_by_id = {}
+        for lesson_file in directory.glob("*.json"):
+            with open(lesson_file, 'r') as f:
+                lesson = json.load(f)
+                lessons_by_id[lesson['id']] = lesson
+        return lessons_by_id
+
+    def _validate_chain(self, lessons_by_id, chain_name):
+        """Validate a lesson chain has no cycles and includes all lessons."""
+        if not lessons_by_id:
+            return  # Empty chain is valid
+
+        # Find all IDs that are referenced as next_lesson
+        all_ids = set(lessons_by_id.keys())
+        referenced_ids = {
+            lesson.get('next_lesson') 
+            for lesson in lessons_by_id.values() 
+            if lesson.get('next_lesson')
+        }
+
+        # Find the first lesson (not referenced by any other lesson)
+        first_ids = all_ids - referenced_ids
+        self.assertEqual(len(first_ids), 1,
+            f"{chain_name}: Expected exactly 1 first lesson, found {len(first_ids)}: {first_ids}")
+
+        first_id = first_ids.pop()
+
+        # Walk the chain and check for cycles
+        visited = set()
+        current_id = first_id
+        chain_order = []
+
+        while current_id:
+            self.assertNotIn(current_id, visited,
+                f"{chain_name}: Cycle detected! '{current_id}' appears twice in chain. "
+                f"Chain so far: {' -> '.join(chain_order)}")
+
+            self.assertIn(current_id, lessons_by_id,
+                f"{chain_name}: Lesson '{current_id}' referenced but not found in lessons")
+
+            visited.add(current_id)
+            chain_order.append(current_id)
+
+            lesson = lessons_by_id[current_id]
+            next_id = lesson.get('next_lesson')
+
+            # If next_lesson is not None, it must exist
+            if next_id is not None:
+                self.assertIn(next_id, lessons_by_id,
+                    f"{chain_name}: Lesson '{current_id}' references non-existent next_lesson '{next_id}'")
+
+            current_id = next_id
+
+        # All lessons should be visited (no orphans)
+        orphans = all_ids - visited
+        self.assertEqual(len(orphans), 0,
+            f"{chain_name}: Found orphan lessons not in chain: {orphans}")
+
+        # Chain length should match number of lessons
+        self.assertEqual(len(chain_order), len(lessons_by_id),
+            f"{chain_name}: Chain has {len(chain_order)} lessons but directory has {len(lessons_by_id)}")
+
+    def test_basic_lessons_chain_valid(self):
+        """Test that basic lessons form a valid linked list."""
+        lessons_by_id = self._load_all_lessons_raw(self.dojo.lessons_dir)
+        self._validate_chain(lessons_by_id, "Basic lessons")
+
+    def test_advanced_lessons_chain_valid(self):
+        """Test that advanced lessons form a valid linked list."""
+        if not self.dojo.advanced_dir.exists():
+            self.skipTest("No advanced lessons directory")
+        lessons_by_id = self._load_all_lessons_raw(self.dojo.advanced_dir)
+        self._validate_chain(lessons_by_id, "Advanced lessons")
+
+    def test_no_cross_chain_references(self):
+        """Test that basic and advanced chains don't reference each other."""
+        basic_ids = {lesson['id'] for lesson in self.dojo.basic_lessons}
+        advanced_ids = {lesson['id'] for lesson in self.dojo.advanced_lessons}
+
+        # Check basic lessons don't point to advanced lessons
+        for lesson in self.dojo.basic_lessons:
+            next_id = lesson.get('next_lesson')
+            if next_id:
+                self.assertNotIn(next_id, advanced_ids,
+                    f"Basic lesson '{lesson['id']}' points to advanced lesson '{next_id}'")
+
+        # Check advanced lessons don't point to basic lessons
+        for lesson in self.dojo.advanced_lessons:
+            next_id = lesson.get('next_lesson')
+            if next_id:
+                self.assertNotIn(next_id, basic_ids,
+                    f"Advanced lesson '{lesson['id']}' points to basic lesson '{next_id}'")
+
+    def test_chains_end_with_null(self):
+        """Test that each chain ends with a lesson where next_lesson is null."""
+        # Check basic chain
+        if self.dojo.basic_lessons:
+            last_basic = self.dojo.basic_lessons[-1]
+            self.assertIsNone(last_basic.get('next_lesson'),
+                f"Last basic lesson '{last_basic['id']}' should have next_lesson=null, "
+                f"but has '{last_basic.get('next_lesson')}'")
+
+        # Check advanced chain
+        if self.dojo.advanced_lessons:
+            last_advanced = self.dojo.advanced_lessons[-1]
+            self.assertIsNone(last_advanced.get('next_lesson'),
+                f"Last advanced lesson '{last_advanced['id']}' should have next_lesson=null, "
+                f"but has '{last_advanced.get('next_lesson')}'")
+
+    def test_all_next_lesson_references_exist(self):
+        """Test that every next_lesson reference points to an existing lesson."""
+        all_ids = {lesson['id'] for lesson in self.dojo.lessons}
+
+        for lesson in self.dojo.lessons:
+            next_id = lesson.get('next_lesson')
+            if next_id is not None:
+                self.assertIn(next_id, all_ids,
+                    f"Lesson '{lesson['id']}' references non-existent next_lesson '{next_id}'")
+
+
 def run_tests():
-    """Run all lesson content tests."""
+    """Run all lesson tests."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestLessonContent)
+    suite = unittest.TestSuite()
+    suite.addTests(loader.loadTestsFromTestCase(TestLessonContent))
+    suite.addTests(loader.loadTestsFromTestCase(TestLessonLinkedList))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result.wasSuccessful()

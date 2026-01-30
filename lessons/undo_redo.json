@@ -5,5 +5,5 @@
   "setup_file": "Keep this DELETE text here",
   "validation_type": "exact_match",
   "target_content": "Keep this DELETE text here",
-  "next_lesson": "save_without_quit"
+  "next_lesson": "repeat_command"
 }

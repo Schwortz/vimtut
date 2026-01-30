@@ -5,5 +5,5 @@
   "setup_file": "Line 1\nLine 2\nDELETE 3\nLine 4\nDELETE 5\nLine 6\nDELETE 7\nLine 8\nLine 9\nLine 10",
   "validation_type": "exact_match",
   "target_content": "Line 1\nLine 2\nLine 4\nLine 6\nLine 8\nLine 9\nLine 10",
-  "next_lesson": "repeat_command"
+  "next_lesson": null
 }

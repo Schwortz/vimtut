@@ -1,0 +1,93 @@
+" Vim Dojo Tutorial Configuration - VERTICAL SPLIT VERSION
+" This config is used for lesson 24 (marks) to show instructions on the right
+
+" Show line numbers
+set number
+
+" Highlight current line
+set cursorline
+
+" Enable syntax highlighting
+syntax on
+
+" Set status line to show lesson info
+set laststatus=2
+set statusline=\ VIM\ DOJO\ \|\ Press\ ESC\ then\ :wq\ to\ save\ and\ quit
+
+" Show the current mode (INSERT, VISUAL, etc.)
+set showmode
+
+" Make backspace work as expected in insert mode
+set backspace=indent,eol,start
+
+" Reduce startup messages
+set shortmess+=I    " Don't show intro message
+set shortmess+=F    " Don't show file info when editing
+
+" Create vertical split view with instructions on startup
+augroup VimDojoSetup
+  autocmd!
+  autocmd VimEnter * call SetupVimDojoVertical()
+augroup END
+
+function! DojoQuit(save)
+  " Custom quit function for Vim Dojo
+  " a:save = 1 means save before quit (:wq), 0 means just quit (:q)
+  if a:save
+    " Save current file first
+    write
+  endif
+  " Then quit all windows
+  qall
+endfunction
+
+function! SetupVimDojoVertical()
+  " Save the current file name (the task file)
+  let l:task_file = expand('%:p')
+  let l:instructions_file = expand('%:p:h') . '/instructions.txt'
+
+  " Check if instructions file exists
+  if filereadable(l:instructions_file)
+    " Create VERTICAL split with instructions on the RIGHT
+    " Use silent! to suppress file info messages
+    silent! execute 'rightbelow vsplit ' . l:instructions_file
+
+    " Make instructions window take about 50 columns (adjust as needed)
+    vertical resize 60
+
+    " Make it read-only
+    setlocal readonly
+    setlocal nomodifiable
+
+    " Disable line numbers in instructions pane
+    setlocal nonumber
+
+    " Disable cursor line in instructions
+    setlocal nocursorline
+
+    " Set a different status line for instructions
+    setlocal statusline=\ INSTRUCTIONS\ (Read-Only)
+
+    " Move back to the LEFT window (task file)
+    wincmd h
+
+    " Focus on the task file
+    " Go to first line
+    normal! gg
+
+    " Redraw to ensure clean display
+    redraw!
+
+    " Remap :q and :wq to close all windows
+    " :wq saves current file then quits all
+    " :q just quits all
+    cnoreabbrev <expr> q getcmdtype() == ':' && getcmdline() == 'q' ? 'call DojoQuit(0)' : 'q'
+    cnoreabbrev <expr> wq getcmdtype() == ':' && getcmdline() == 'wq' ? 'call DojoQuit(1)' : 'wq'
+    cnoreabbrev <expr> x getcmdtype() == ':' && getcmdline() == 'x' ? 'call DojoQuit(1)' : 'x'
+  endif
+endfunction
+
+" Key mappings for easier window navigation (for vertical splits)
+" Ctrl+h and Ctrl+l to move between left/right splits
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l

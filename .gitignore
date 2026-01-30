@@ -1,6 +1,8 @@
 # Vim Dojo workspace files
 workspace/current_task.txt
 workspace/instructions.txt
+workspace/task2.txt
+workspace/section2.txt
 workspace/*.swp
 workspace/*.swo
 

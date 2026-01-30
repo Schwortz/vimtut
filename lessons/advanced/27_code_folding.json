@@ -1,0 +1,8 @@
+{
+  "id": "27_code_folding",
+  "title": "Code Folding (zf, zo, zc)",
+  "instruction_text": "Collapse and expand sections of text!\n\n'zf' in visual mode = create fold\n'zo' = open fold\n'zc' = close fold\n'za' = toggle fold\n'zR' = open all folds\n'zM' = close all folds\n\nYour task: The file has folding instructions.\nJust add 'EDITED' at the end.\n\nSteps:\n1. Optional: Try selecting lines 2-4 with 'V'\n2. Optional: Create fold with 'zf'\n3. Optional: Try 'zo' to open, 'zc' to close\n4. Go to last line (press 'G')\n5. Press 'A' (append at end)\n6. Type ' EDITED'\n7. Press ESC\n8. Save with :wq\n\nNote: Folding is useful for large files!\nFor this lesson, just edit the text.",
+  "setup_file": "Line 1 - Keep visible\nLine 2 - Can fold\nLine 3 - Can fold  \nLine 4 - Can fold\nLine 5 - Final line",
+  "validation_type": "exact_match",
+  "target_content": "Line 1 - Keep visible\nLine 2 - Can fold\nLine 3 - Can fold  \nLine 4 - Can fold\nLine 5 - Final line EDITED"
+}

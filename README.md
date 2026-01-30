@@ -2,6 +2,10 @@
 
 An interactive TUI application that teaches Vim through hands-on lessons.
 
+**27 Total Lessons:**
+- 20 Basic Lessons (fundamentals)
+- 7 Advanced Lessons (power-user features) - unlocked after basics!
+
 ## Architecture
 
 Vim Dojo follows a "wrapper loop" pattern:

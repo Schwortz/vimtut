@@ -19,18 +19,23 @@ class VimDojo:
     def __init__(self):
         self.base_dir = Path(__file__).parent
         self.lessons_dir = self.base_dir / "lessons"
+        self.advanced_dir = self.lessons_dir / "advanced"
         self.workspace_dir = self.base_dir / "workspace"
         self.vimrc_path = self.workspace_dir / ".vimrc"
         self.current_lesson_file = self.workspace_dir / "current_task.txt"
         self.progress_file = self.base_dir / "progress.json"
 
-        self.lessons = self.load_lessons()
+        self.basic_lessons = self.load_lessons(self.lessons_dir, recursive=False)
+        self.advanced_lessons = self.load_lessons(self.advanced_dir, recursive=False) if self.advanced_dir.exists() else []
+        self.lessons = self.basic_lessons + self.advanced_lessons  # For compatibility
         self.completed_lessons = self.load_progress()
+        self.current_mode = 'basic'  # 'basic' or 'advanced'
 
-    def load_lessons(self) -> List[Dict]:
-        """Load all lesson configurations from the lessons directory."""
+    def load_lessons(self, directory: Path, recursive: bool = False) -> List[Dict]:
+        """Load lesson configurations from a directory."""
         lessons = []
-        for lesson_file in sorted(self.lessons_dir.glob("*.json")):
+        pattern = "**/*.json" if recursive else "*.json"
+        for lesson_file in sorted(directory.glob(pattern)):
             with open(lesson_file, 'r') as f:
                 lessons.append(json.load(f))
         return lessons
@@ -71,6 +76,20 @@ class VimDojo:
         # Store the initial modification time
         self.file_mtime_before = os.path.getmtime(self.current_lesson_file)
 
+        # Special setup for multiple files lesson (lesson 22)
+        if lesson['id'] == '22_multiple_files':
+            task2_file = self.workspace_dir / "task2.txt"
+            with open(task2_file, 'w') as f:
+                f.write("This is the second file (task2.txt)")
+            # Store its mtime too for validation
+            self.task2_mtime_before = os.path.getmtime(task2_file)
+
+        # Special setup for split windows lesson (lesson 23)
+        if lesson['id'] == '23_split_windows':
+            section2_file = self.workspace_dir / "section2.txt"
+            with open(section2_file, 'w') as f:
+                f.write("=== TARGET FILE ===\n\nPassword: REPLACE_ME")
+
         # Create instructions file for Vim split view (only if lesson has full metadata)
         if 'title' in lesson and 'instruction_text' in lesson:
             instructions_file = self.workspace_dir / "instructions.txt"
@@ -83,19 +102,53 @@ class VimDojo:
                 f.write("This pane is READ-ONLY. Edit in the pane above.\n")
                 f.write("=" * 70 + "\n")  # Add trailing newline to avoid "Incomplete last line"
 
-    def launch_vim(self):
+    def launch_vim(self, lesson: Dict = None):
         """Launch Vim with the tutorial configuration."""
         # Save terminal state
         curses.endwin()
 
-        # Launch Vim with custom config
+        # Choose vimrc: use vertical split version for lesson 24
+        vimrc_to_use = self.vimrc_path
+        if lesson and lesson['id'] == '24_marks':
+            vimrc_to_use = self.workspace_dir / ".vimrc_vsplit"
+
+        # Build command
         cmd = [
             'vim',
-            '-u', str(self.vimrc_path),
-            str(self.current_lesson_file)
+            '-u', str(vimrc_to_use),
         ]
 
-        subprocess.run(cmd)
+        # Special handling for multiple files lesson (lesson 22)
+        # Open both files so user can switch between them
+        if lesson and lesson['id'] == '22_multiple_files':
+            task2_file = self.workspace_dir / "task2.txt"
+            cmd.append(str(self.current_lesson_file))
+            cmd.append(str(task2_file))
+        # Special handling for split windows lesson (lesson 23)
+        # Open both files but don't auto-split (user must split)
+        elif lesson and lesson['id'] == '23_split_windows':
+            section2_file = self.workspace_dir / "section2.txt"
+            cmd.append(str(self.current_lesson_file))
+            cmd.append(str(section2_file))
+        # Special handling for marks lesson (lesson 24)
+        # Pre-set marks at DELETE_THIS positions
+        elif lesson and lesson['id'] == '24_marks':
+            cmd.append(str(self.current_lesson_file))
+            # Execute commands to set marks at each DELETE_THIS occurrence
+            cmd.extend([
+                '-c', '/DELETE_THIS',  # Find first occurrence
+                '-c', 'normal! ma',     # Set mark a
+                '-c', 'silent! normal! n',  # Find next (silent to avoid error messages)
+                '-c', 'normal! mb',     # Set mark b
+                '-c', 'silent! normal! n',  # Find next
+                '-c', 'normal! mc',     # Set mark c
+                '-c', 'normal! gg',     # Go back to top
+            ])
+        else:
+            cmd.append(str(self.current_lesson_file))
+
+        # Run from workspace directory so relative paths work
+        subprocess.run(cmd, cwd=str(self.workspace_dir))
 
         # Restore curses
         stdscr = curses.initscr()
@@ -109,7 +162,42 @@ class VimDojo:
         """Validate if the user completed the lesson correctly."""
         validation_type = lesson['validation_type']
 
-        if validation_type == 'file_saved':
+        if validation_type == 'exact_match_file':
+            # Special validation for multiple files lesson - check a different file
+            validation_file = self.workspace_dir / lesson.get('validation_file', 'task2.txt')
+
+            if not validation_file.exists():
+                return False, f"The file '{lesson.get('validation_file')}' wasn't created or saved.\nDid you use ':e {lesson.get('validation_file')}' to open it?"
+
+            with open(validation_file, 'r') as f:
+                content = f.read()
+
+            content_normalized = content.rstrip('\n')
+            target_normalized = lesson['target_content'].rstrip('\n')
+
+            if content_normalized == target_normalized:
+                return True, "Perfect! You successfully edited the second file!"
+            else:
+                expected_lines = target_normalized.split('\n')
+                got_lines = content_normalized.split('\n')
+
+                diff_msg = "Not quite right. Check the second file (task2.txt).\n\n"
+                diff_msg += "Line-by-line comparison:\n"
+
+                for i in range(max(len(expected_lines), len(got_lines))):
+                    exp = expected_lines[i] if i < len(expected_lines) else "<missing>"
+                    got = got_lines[i] if i < len(got_lines) else "<missing>"
+
+                    if exp == got:
+                        diff_msg += f"Line {i+1}: OK\n"
+                    else:
+                        diff_msg += f"Line {i+1}: DIFFERENT\n"
+                        diff_msg += f"  Expected: [{exp}]\n"
+                        diff_msg += f"  Got:      [{got}]\n"
+
+                return False, diff_msg
+
+        elif validation_type == 'file_saved':
             # Check if file exists and was modified (saved)
             if not self.current_lesson_file.exists():
                 return False, "The file doesn't exist. Did you use :q! instead of :wq?"
@@ -172,27 +260,40 @@ class VimDojo:
 
         return False, "Unknown validation type"
 
+    def all_basic_lessons_complete(self) -> bool:
+        """Check if all basic lessons are completed."""
+        basic_ids = set(lesson['id'] for lesson in self.basic_lessons)
+        return basic_ids.issubset(self.completed_lessons)
+
     def draw_menu(self, stdscr, selected_idx: int):
         """Draw the main lesson menu."""
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
+        # Determine current lesson set
+        current_lessons = self.basic_lessons if self.current_mode == 'basic' else self.advanced_lessons
+
         # Title
-        title = "[ VIM DOJO ]"
+        mode_title = "BASIC" if self.current_mode == 'basic' else "ADVANCED"
+        title = f"[ VIM DOJO - {mode_title} LESSONS ]"
         stdscr.addstr(0, (width - len(title)) // 2, title, curses.A_BOLD)
 
-        # Progress bar
-        progress_pct = int((len(self.completed_lessons) / len(self.lessons)) * 100)
-        progress_text = f"Progress: {len(self.completed_lessons)}/{len(self.lessons)} ({progress_pct}%)"
+        # Progress bar for current mode
+        completed_in_mode = sum(1 for lesson in current_lessons if lesson['id'] in self.completed_lessons)
+        progress_pct = int((completed_in_mode / len(current_lessons)) * 100) if current_lessons else 0
+        progress_text = f"Progress: {completed_in_mode}/{len(current_lessons)} ({progress_pct}%)"
         stdscr.addstr(1, (width - len(progress_text)) // 2, progress_text)
         stdscr.addstr(2, 0, "-" * width)
 
-        # Lessons
-        for idx, lesson in enumerate(self.lessons):
+        # Lessons for current mode
+        for idx, lesson in enumerate(current_lessons):
             y = 4 + idx
             completed = lesson['id'] in self.completed_lessons
             checkbox = "[x]" if completed else "[ ]"
-            prefix = f"{checkbox} {idx + 1}. "
+
+            # Get lesson number (extract from ID like "21_macros" -> 21)
+            lesson_num = int(lesson['id'].split('_')[0])
+            prefix = f"{checkbox} {lesson_num}. "
             lesson_text = f"{prefix}{lesson['title']}"
 
             if idx == selected_idx:
@@ -202,11 +303,17 @@ class VimDojo:
                 stdscr.addstr(y, 2, lesson_text)
 
         # Instructions
-        y = 6 + len(self.lessons)
+        y = 6 + len(current_lessons)
         stdscr.addstr(y, 0, "-" * width)
         stdscr.addstr(y + 1, 2, "Press ENTER to start lesson")
         stdscr.addstr(y + 2, 2, "Press 'q' to quit")
         stdscr.addstr(y + 3, 2, "Use UP/DOWN arrows or j/k to navigate")
+
+        # Show mode switch option
+        if self.current_mode == 'basic' and self.all_basic_lessons_complete():
+            stdscr.addstr(y + 4, 2, "Press 'a' to access ADVANCED lessons", curses.A_BOLD)
+        elif self.current_mode == 'advanced':
+            stdscr.addstr(y + 4, 2, "Press 'b' to return to BASIC lessons")
 
         stdscr.refresh()
 
@@ -288,30 +395,54 @@ class VimDojo:
             return False
         return True
 
+    def cleanup_lesson(self, lesson: Dict):
+        """Clean up any temporary files created for a lesson."""
+        # Clean up task2.txt for multiple files lesson
+        if lesson['id'] == '22_multiple_files':
+            task2_file = self.workspace_dir / "task2.txt"
+            if task2_file.exists():
+                os.remove(task2_file)
+
+        # Clean up section2.txt for split windows lesson
+        if lesson['id'] == '23_split_windows':
+            section2_file = self.workspace_dir / "section2.txt"
+            if section2_file.exists():
+                os.remove(section2_file)
+
     def run_lesson(self, stdscr, lesson: Dict):
         """Execute the full lesson cycle: vim -> verification -> debrief."""
-        while True:
-            # 1. Setup and launch Vim directly (no briefing screen)
-            self.setup_lesson(lesson)
-            stdscr = self.launch_vim()
+        try:
+            while True:
+                # 1. Setup and launch Vim directly (no briefing screen)
+                self.setup_lesson(lesson)
+                stdscr = self.launch_vim(lesson)
 
-            # 2. Validation
-            success, message = self.validate_lesson(lesson)
+                # 2. Validation
+                success, message = self.validate_lesson(lesson)
 
-            # 3. Debrief
-            should_retry = self.draw_debrief(stdscr, success, message)
+                # 3. Debrief
+                should_retry = self.draw_debrief(stdscr, success, message)
 
-            if success:
-                self.completed_lessons.add(lesson['id'])
-                self.save_progress()
+                if success:
+                    self.completed_lessons.add(lesson['id'])
+                    self.save_progress()
 
-                # Check if all lessons are complete
-                if len(self.completed_lessons) == len(self.lessons):
-                    self.show_completion_celebration(stdscr)
-                break
-            elif not should_retry:
-                # User chose to return to menu without completing
-                break
+                    # Check if all basic lessons are complete (show unlock message)
+                    if self.current_mode == 'basic' and self.all_basic_lessons_complete():
+                        all_lessons_complete = len(self.completed_lessons) == len(self.lessons)
+                        if not all_lessons_complete:
+                            self.show_advanced_unlock(stdscr)
+
+                    # Check if ALL lessons (basic + advanced) are complete
+                    if len(self.completed_lessons) == len(self.lessons):
+                        self.show_completion_celebration(stdscr)
+                    break
+                elif not should_retry:
+                    # User chose to return to menu without completing
+                    break
+        finally:
+            # Always clean up lesson files
+            self.cleanup_lesson(lesson)
 
     def main_loop(self, stdscr):
         """Main TUI loop."""
@@ -321,19 +452,75 @@ class VimDojo:
         selected_idx = 0
 
         while True:
+            current_lessons = self.basic_lessons if self.current_mode == 'basic' else self.advanced_lessons
+
             self.draw_menu(stdscr, selected_idx)
 
             key = stdscr.getch()
 
             if key == ord('q') or key == ord('Q'):
                 break
+            elif key == ord('a') or key == ord('A'):
+                # Switch to advanced mode (only if basics complete)
+                if self.current_mode == 'basic' and self.all_basic_lessons_complete():
+                    self.current_mode = 'advanced'
+                    selected_idx = 0
+            elif key == ord('b') or key == ord('B'):
+                # Switch to basic mode
+                if self.current_mode == 'advanced':
+                    self.current_mode = 'basic'
+                    selected_idx = 0
             elif key == curses.KEY_UP or key == ord('k') or key == ord('K'):
                 selected_idx = max(0, selected_idx - 1)
             elif key == curses.KEY_DOWN or key == ord('j') or key == ord('J'):
-                selected_idx = min(len(self.lessons) - 1, selected_idx + 1)
+                selected_idx = min(len(current_lessons) - 1, selected_idx + 1)
             elif key == ord('\n') or key == curses.KEY_ENTER:
-                lesson = self.lessons[selected_idx]
-                self.run_lesson(stdscr, lesson)
+                if selected_idx < len(current_lessons):
+                    lesson = current_lessons[selected_idx]
+                    self.run_lesson(stdscr, lesson)
+
+    def show_advanced_unlock(self, stdscr):
+        """Show message when advanced lessons are unlocked."""
+        stdscr.clear()
+        height, width = stdscr.getmaxyx()
+
+        message = [
+            "",
+            "  ███████╗██╗  ██╗ ██████╗███████╗██╗     ██╗     ███████╗███╗   ██╗████████╗██╗",
+            "  ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║     ██║     ██╔════╝████╗  ██║╚══██╔══╝██║",
+            "  █████╗   ╚███╔╝ ██║     █████╗  ██║     ██║     █████╗  ██╔██╗ ██║   ██║   ██║",
+            "  ██╔══╝   ██╔██╗ ██║     ██╔══╝  ██║     ██║     ██╔══╝  ██║╚██╗██║   ██║   ╚═╝",
+            "  ███████╗██╔╝ ██╗╚██████╗███████╗███████╗███████╗███████╗██║ ╚████║   ██║   ██╗",
+            "  ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝",
+            "",
+            "            🎓 You've completed all BASIC lessons! 🎓",
+            "",
+            "              ADVANCED LESSONS are now unlocked!",
+            "",
+            "         Press 'a' in the main menu to access advanced topics:",
+            "              • Macros          • Marks",
+            "              • Multiple files  • Registers",
+            "              • Split windows   • Find & Replace",
+            "                      • Code Folding",
+            "",
+            "                   Ready for the next level?",
+            "",
+        ]
+
+        start_y = max(0, (height - len(message)) // 2)
+        for idx, line in enumerate(message):
+            if start_y + idx < height:
+                x = max(0, (width - len(line)) // 2)
+                try:
+                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                except curses.error:
+                    pass
+
+        footer = "Press any key to continue"
+        stdscr.addstr(height - 2, (width - len(footer)) // 2, footer)
+
+        stdscr.refresh()
+        stdscr.getch()
 
     def show_completion_celebration(self, stdscr):
         """Show a celebration screen when all lessons are complete."""
@@ -350,14 +537,15 @@ class VimDojo:
             " ╚██████╗╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║██║  ██║   ██║   ███████║██╗",
             "  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝",
             "",
-            "                     🎉  YOU'VE MASTERED VIM!  🎉",
+            "                🎉  YOU'VE MASTERED VIM!  🎉",
             "",
-            "                You've completed all 20 lessons!",
+            "           You've completed ALL 27 lessons!",
+            "              (20 Basic + 7 Advanced)",
             "",
-            "                   You are now a Vim master.",
-            "                 Go forth and edit with power!",
+            "            You are now a true Vim master.",
+            "          Go forth and edit with ultimate power!",
             "",
-            "                         ⚡ ⚡ ⚡",
+            "                    ⚡ ⚡ ⚡ ⚡ ⚡",
             "",
         ]
 

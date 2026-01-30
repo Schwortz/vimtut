@@ -96,7 +96,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_validation_types_are_valid(self):
         """Ensure all lessons use valid validation types."""
-        valid_types = ['file_saved', 'exact_match', 'contains']
+        valid_types = ['file_saved', 'exact_match', 'contains', 'exact_match_file']
 
         for lesson in self.dojo.lessons:
             validation_type = lesson.get('validation_type')

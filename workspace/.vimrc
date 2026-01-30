@@ -52,8 +52,8 @@ function! SetupVimDojo()
     " Use silent! to suppress file info messages
     silent! execute 'belowright split ' . l:instructions_file
 
-    " Make instructions window smaller (about 1/3 of screen)
-    resize 12
+    " Make instructions window large enough to show content (most lessons need 20-28 lines)
+    resize 25
 
     " Make it read-only
     setlocal readonly
@@ -65,8 +65,12 @@ function! SetupVimDojo()
     " Disable cursor line in instructions
     setlocal nocursorline
 
+    " Enable word wrapping for long lines
+    setlocal wrap
+    setlocal linebreak
+
     " Set a different status line for instructions
-    setlocal statusline=\ INSTRUCTIONS\ (Read-Only)
+    setlocal statusline=\ INSTRUCTIONS\ (Read-Only)\ -\ Scroll\ with\ Ctrl+j\ then\ j/k
 
     " Move back to the top window (task file)
     wincmd k

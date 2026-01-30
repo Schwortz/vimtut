@@ -52,8 +52,8 @@ function! SetupVimDojoVertical()
     " Use silent! to suppress file info messages
     silent! execute 'rightbelow vsplit ' . l:instructions_file
 
-    " Make instructions window take about 50 columns (adjust as needed)
-    vertical resize 60
+    " Make instructions window wide enough to show content
+    vertical resize 70
 
     " Make it read-only
     setlocal readonly
@@ -65,8 +65,12 @@ function! SetupVimDojoVertical()
     " Disable cursor line in instructions
     setlocal nocursorline
 
+    " Enable word wrapping for long lines
+    setlocal wrap
+    setlocal linebreak
+
     " Set a different status line for instructions
-    setlocal statusline=\ INSTRUCTIONS\ (Read-Only)
+    setlocal statusline=\ INSTRUCTIONS\ (Read-Only)\ -\ Scroll\ with\ Ctrl+l\ then\ j/k
 
     " Move back to the LEFT window (task file)
     wincmd h

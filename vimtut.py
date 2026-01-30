@@ -539,24 +539,25 @@ class Vimtut:
             
             # ASCII art title
             title_art = [
-                " ██╗   ██╗██╗███╗   ███╗████████╗██╗   ██╗████████╗",
-                " ██║   ██║██║████╗ ████║╚══██╔══╝██║   ██║╚══██╔══╝",
-                " ██║   ██║██║██╔████╔██║   ██║   ██║   ██║   ██║   ",
-                " ╚██╗ ██╔╝██║██║╚██╔╝██║   ██║   ██║   ██║   ██║   ",
-                "  ╚████╔╝ ██║██║ ╚═╝ ██║   ██║   ╚██████╔╝   ██║   ",
-                "   ╚═══╝  ╚═╝╚═╝     ╚═╝   ╚═╝    ╚═════╝    ╚═╝   ",
+                "██╗   ██╗██╗███╗   ███╗████████╗██╗   ██╗████████╗",
+                "██║   ██║██║████╗ ████║╚══██╔══╝██║   ██║╚══██╔══╝",
+                "██║   ██║██║██╔████╔██║   ██║   ██║   ██║   ██║   ",
+                "╚██╗ ██╔╝██║██║╚██╔╝██║   ██║   ██║   ██║   ██║   ",
+                " ╚████╔╝ ██║██║ ╚═╝ ██║   ██║   ╚██████╔╝   ██║   ",
+                "  ╚═══╝  ╚═╝╚═╝     ╚═╝   ╚═╝    ╚═════╝    ╚═╝   ",
             ]
             
-            # Center and display title
+            # Center title block
+            title_max_len = max(len(line) for line in title_art)
+            title_x = max(0, (width - title_max_len) // 2)
             start_y = 2
             for idx, line in enumerate(title_art):
-                x = max(0, (width - len(line)) // 2)
                 try:
-                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                    stdscr.addstr(start_y + idx, title_x, line, curses.A_BOLD)
                 except curses.error:
                     pass
             
-            # Welcome message
+            # Welcome message - each line centered individually
             messages = [
                 "",
                 "Welcome to Vimtut - Learn Vim the hands-on way!",
@@ -564,9 +565,9 @@ class Vimtut:
                 "This interactive tutorial will teach you Vim through",
                 "practical exercises. Each lesson includes:",
                 "",
-                "  - Clear instructions in a split pane",
-                "  - A task file for you to edit",
-                "  - Automatic validation of your work",
+                "* Clear instructions in a split pane",
+                "* A task file for you to edit",
+                "* Automatic validation of your work",
                 "",
                 "You'll start with basic navigation and progress to",
                 "advanced features like macros, marks, and registers.",
@@ -672,35 +673,54 @@ class Vimtut:
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
-        message = [
+        # ASCII art - block centered
+        title_art = [
+            "███████╗██╗  ██╗ ██████╗███████╗██╗     ██╗     ███████╗███╗   ██╗████████╗██╗",
+            "██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║     ██║     ██╔════╝████╗  ██║╚══██╔══╝██║",
+            "█████╗   ╚███╔╝ ██║     █████╗  ██║     ██║     █████╗  ██╔██╗ ██║   ██║   ██║",
+            "██╔══╝   ██╔██╗ ██║     ██╔══╝  ██║     ██║     ██╔══╝  ██║╚██╗██║   ██║   ╚═╝",
+            "███████╗██╔╝ ██╗╚██████╗███████╗███████╗███████╗███████╗██║ ╚████║   ██║   ██╗",
+            "╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝",
+        ]
+        
+        # Text messages - each line centered individually
+        messages = [
             "",
-            "  ███████╗██╗  ██╗ ██████╗███████╗██╗     ██╗     ███████╗███╗   ██╗████████╗██╗",
-            "  ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║     ██║     ██╔════╝████╗  ██║╚══██╔══╝██║",
-            "  █████╗   ╚███╔╝ ██║     █████╗  ██║     ██║     █████╗  ██╔██╗ ██║   ██║   ██║",
-            "  ██╔══╝   ██╔██╗ ██║     ██╔══╝  ██║     ██║     ██╔══╝  ██║╚██╗██║   ██║   ╚═╝",
-            "  ███████╗██╔╝ ██╗╚██████╗███████╗███████╗███████╗███████╗██║ ╚████║   ██║   ██╗",
-            "  ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝",
+            "You've completed all BASIC lessons!",
             "",
-            "            🎓 You've completed all BASIC lessons! 🎓",
+            "ADVANCED LESSONS are now unlocked!",
             "",
-            "              ADVANCED LESSONS are now unlocked!",
+            "Press 'a' in the main menu to access advanced topics:",
             "",
-            "         Press 'a' in the main menu to access advanced topics:",
-            "              • Macros          • Marks",
-            "              • Multiple files  • Registers",
-            "              • Split windows   • Find & Replace",
-            "                      • Code Folding",
+            "* Macros           * Marks",
+            "* Multiple files   * Registers",
+            "* Split windows    * Find & Replace",
+            "* Code Folding",
             "",
-            "                   Ready for the next level?",
+            "Ready for the next level?",
             "",
         ]
 
-        start_y = max(0, (height - len(message)) // 2)
-        for idx, line in enumerate(message):
+        total_height = len(title_art) + len(messages)
+        start_y = max(0, (height - total_height) // 2)
+        
+        # Draw title art as block
+        title_max_len = max(len(line) for line in title_art)
+        title_x = max(0, (width - title_max_len) // 2)
+        for idx, line in enumerate(title_art):
             if start_y + idx < height:
+                try:
+                    stdscr.addstr(start_y + idx, title_x, line, curses.A_BOLD)
+                except curses.error:
+                    pass
+        
+        # Draw messages centered individually
+        msg_start_y = start_y + len(title_art)
+        for idx, line in enumerate(messages):
+            if msg_start_y + idx < height:
                 x = max(0, (width - len(line)) // 2)
                 try:
-                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                    stdscr.addstr(msg_start_y + idx, x, line, curses.A_BOLD)
                 except curses.error:
                     pass
 
@@ -720,35 +740,49 @@ class Vimtut:
         basic = len(self.basic_lessons)
         advanced = len(self.advanced_lessons)
 
-        # ASCII art celebration
-        celebration = [
+        # ASCII art - block centered
+        title_art = [
+            "██████╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗██╗",
+            "██╔════╝██╔═══██╗████╗  ██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██║",
+            "██║     ██║   ██║██╔██╗ ██║██║  ███╗██████╔╝███████║   ██║   ███████╗██║",
+            "██║     ██║   ██║██║╚██╗██║██║   ██║██╔══██╗██╔══██║   ██║   ╚════██║╚═╝",
+            "╚██████╗╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║██║  ██║   ██║   ███████║██╗",
+            " ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝",
+        ]
+        
+        # Text messages - each line centered individually
+        messages = [
             "",
-            "  ██████╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗██╗",
-            " ██╔════╝██╔═══██╗████╗  ██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██║",
-            " ██║     ██║   ██║██╔██╗ ██║██║  ███╗██████╔╝███████║   ██║   ███████╗██║",
-            " ██║     ██║   ██║██║╚██╗██║██║   ██║██╔══██╗██╔══██║   ██║   ╚════██║╚═╝",
-            " ╚██████╗╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║██║  ██║   ██║   ███████║██╗",
-            "  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝",
+            "YOU'VE MASTERED VIM!",
             "",
-            "                🎉  YOU'VE MASTERED VIM!  🎉",
+            f"You've completed ALL {total} lessons!",
+            f"({basic} Basic + {advanced} Advanced)",
             "",
-            f"           You've completed ALL {total} lessons!",
-            f"              ({basic} Basic + {advanced} Advanced)",
-            "",
-            "            You are now a true Vim master.",
-            "          Go forth and edit with ultimate power!",
-            "",
-            "                    ⚡ ⚡ ⚡ ⚡ ⚡",
+            "You are now a true Vim master.",
+            "Go forth and edit with ultimate power!",
             "",
         ]
 
-        # Center and display celebration
-        start_y = max(0, (height - len(celebration)) // 2)
-        for idx, line in enumerate(celebration):
+        total_height = len(title_art) + len(messages)
+        start_y = max(0, (height - total_height) // 2)
+        
+        # Draw title art as block
+        title_max_len = max(len(line) for line in title_art)
+        title_x = max(0, (width - title_max_len) // 2)
+        for idx, line in enumerate(title_art):
             if start_y + idx < height:
+                try:
+                    stdscr.addstr(start_y + idx, title_x, line, curses.A_BOLD)
+                except curses.error:
+                    pass
+        
+        # Draw messages centered individually
+        msg_start_y = start_y + len(title_art)
+        for idx, line in enumerate(messages):
+            if msg_start_y + idx < height:
                 x = max(0, (width - len(line)) // 2)
                 try:
-                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                    stdscr.addstr(msg_start_y + idx, x, line, curses.A_BOLD)
                 except curses.error:
                     pass  # Ignore if line doesn't fit
 

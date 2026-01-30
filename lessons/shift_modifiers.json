@@ -1,0 +1,9 @@
+{
+  "id": "shift_modifiers",
+  "title": "Shift Reverses Direction (F, T, N, P, O)",
+  "instruction_text": "Shift often reverses direction or modifies scope!\n\nCommon Shift patterns:\n  f/F = find forward/backward\n  t/T = till forward/backward\n  n/N = next/previous search match\n  o/O = open line below/above\n  p/P = paste after/before cursor\n  a/A = append after cursor/at end of line\n  i/I = insert at cursor/at start of line\n  w/W = word/WORD (whitespace-delimited)\n\nYour task: Delete all X's by searching BACKWARD.\n\nSteps:\n1. Press '$' to go to end of line\n2. Press 'FX' to find X backward\n3. Press 'x' to delete it\n4. Press ';' to repeat F (backward again)\n5. Press 'x' to delete\n6. Repeat ';x' until all X's are gone\n7. Save with :wq\n\nTry 'f' when going forward, 'F' when going backward!",
+  "setup_file": "X one X two X three X",
+  "validation_type": "exact_match",
+  "target_content": "one two three",
+  "next_lesson": "line_boundaries"
+}

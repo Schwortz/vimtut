@@ -1,0 +1,9 @@
+{
+  "id": "count_modifier",
+  "title": "Count Modifier (2x, 3w, 5j)",
+  "instruction_text": "Prefix commands with a number to repeat them!\n\nExamples:\n  5x  = delete 5 characters\n  3w  = move 3 words forward\n  4j  = move 4 lines down\n  2dd = delete 2 lines\n  3dw = delete 3 words\n  10G = go to line 10\n\nYour task: Delete the X's efficiently using counts.\n\nLine 1: Delete 5 X's with '5x' (not xxxxx!)\nLine 2: Delete 3 words with '3dw'\n\nSteps:\n1. Cursor is on first X - press '5x'\n2. Press 'j' to go to line 2\n3. Press '3dw' to delete 3 words\n4. Save with :wq\n\nCounts work with almost any command!",
+  "setup_file": "XXXXXhello\nDEL DEL DEL world",
+  "validation_type": "exact_match",
+  "target_content": "hello\nworld",
+  "next_lesson": "undo_redo"
+}

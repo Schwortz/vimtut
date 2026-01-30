@@ -28,7 +28,7 @@ class Vimtut:
         self.basic_lessons = self.load_lessons(self.lessons_dir, recursive=False)
         self.advanced_lessons = self.load_lessons(self.advanced_dir, recursive=False) if self.advanced_dir.exists() else []
         self.lessons = self.basic_lessons + self.advanced_lessons  # For compatibility
-        self.completed_lessons = self.load_progress()
+        self.completed_lessons, self.welcome_seen = self.load_progress()
         self.current_mode = 'basic'  # 'basic' or 'advanced'
 
     def load_lessons(self, directory: Path, recursive: bool = False) -> List[Dict]:
@@ -80,23 +80,24 @@ class Vimtut:
                 return lesson
         return None
 
-    def load_progress(self) -> set:
-        """Load user progress from file."""
+    def load_progress(self) -> tuple:
+        """Load user progress from file. Returns (completed_lessons, welcome_seen)."""
         if self.progress_file.exists():
             try:
                 with open(self.progress_file, 'r') as f:
                     data = json.load(f)
-                    return set(data.get('completed_lessons', []))
+                    return set(data.get('completed_lessons', [])), data.get('welcome_seen', False)
             except (json.JSONDecodeError, IOError):
-                return set()
-        return set()
+                return set(), False
+        return set(), False
 
     def save_progress(self):
         """Save user progress to file."""
         data = {
             'completed_lessons': list(self.completed_lessons),
             'total_lessons': len(self.lessons),
-            'completion_percentage': int((len(self.completed_lessons) / len(self.lessons)) * 100)
+            'completion_percentage': int((len(self.completed_lessons) / len(self.lessons)) * 100),
+            'welcome_seen': self.welcome_seen
         }
         with open(self.progress_file, 'w') as f:
             json.dump(data, f, indent=2)
@@ -525,10 +526,104 @@ class Vimtut:
         # Key not handled by goto logic - clear state
         return (False, "", False, None)
 
+    def show_welcome_screen(self, stdscr):
+        """Show welcome screen on first launch. User must type :begin to continue."""
+        curses.curs_set(1)  # Show cursor for typing
+        stdscr.keypad(True)
+        
+        input_buffer = ""
+        
+        while True:
+            stdscr.clear()
+            height, width = stdscr.getmaxyx()
+            
+            # ASCII art title
+            title_art = [
+                " ██╗   ██╗██╗███╗   ███╗████████╗██╗   ██╗████████╗",
+                " ██║   ██║██║████╗ ████║╚══██╔══╝██║   ██║╚══██╔══╝",
+                " ██║   ██║██║██╔████╔██║   ██║   ██║   ██║   ██║   ",
+                " ╚██╗ ██╔╝██║██║╚██╔╝██║   ██║   ██║   ██║   ██║   ",
+                "  ╚████╔╝ ██║██║ ╚═╝ ██║   ██║   ╚██████╔╝   ██║   ",
+                "   ╚═══╝  ╚═╝╚═╝     ╚═╝   ╚═╝    ╚═════╝    ╚═╝   ",
+            ]
+            
+            # Center and display title
+            start_y = 2
+            for idx, line in enumerate(title_art):
+                x = max(0, (width - len(line)) // 2)
+                try:
+                    stdscr.addstr(start_y + idx, x, line, curses.A_BOLD)
+                except curses.error:
+                    pass
+            
+            # Welcome message
+            messages = [
+                "",
+                "Welcome to Vimtut - Learn Vim the hands-on way!",
+                "",
+                "This interactive tutorial will teach you Vim through",
+                "practical exercises. Each lesson includes:",
+                "",
+                "  - Clear instructions in a split pane",
+                "  - A task file for you to edit",
+                "  - Automatic validation of your work",
+                "",
+                "You'll start with basic navigation and progress to",
+                "advanced features like macros, marks, and registers.",
+                "",
+                "Ready to begin your Vim journey?",
+                "",
+            ]
+            
+            msg_start_y = start_y + len(title_art) + 1
+            for idx, line in enumerate(messages):
+                if msg_start_y + idx < height - 4:
+                    x = max(0, (width - len(line)) // 2)
+                    try:
+                        stdscr.addstr(msg_start_y + idx, x, line)
+                    except curses.error:
+                        pass
+            
+            # Command prompt
+            prompt_y = height - 3
+            stdscr.addstr(prompt_y - 1, 0, "-" * width)
+            prompt_text = "Type :begin and press Enter to start"
+            stdscr.addstr(prompt_y, (width - len(prompt_text)) // 2, prompt_text, curses.A_BOLD)
+            
+            # Input line (vim-style at bottom)
+            input_y = height - 1
+            stdscr.addstr(input_y, 0, ":" + input_buffer)
+            stdscr.move(input_y, 1 + len(input_buffer))
+            
+            stdscr.refresh()
+            
+            key = stdscr.getch()
+            
+            if key == ord('\n') or key == curses.KEY_ENTER:
+                if input_buffer == "begin":
+                    self.welcome_seen = True
+                    self.save_progress()
+                    curses.curs_set(0)  # Hide cursor
+                    return
+                else:
+                    input_buffer = ""  # Clear and try again
+            elif key == 27:  # ESC - clear input
+                input_buffer = ""
+            elif key in (curses.KEY_BACKSPACE, 127, 8):  # Backspace
+                input_buffer = input_buffer[:-1]
+            elif key == ord(':'):  # Ignore extra colons
+                pass
+            elif 32 <= key <= 126:  # Printable characters
+                input_buffer += chr(key)
+
     def main_loop(self, stdscr):
         """Main TUI loop."""
         curses.curs_set(0)
         stdscr.keypad(True)
+        
+        # Show welcome screen on first launch
+        if not self.welcome_seen:
+            self.show_welcome_screen(stdscr)
 
         selected_idx = 0
         count_buffer = ""  # Accumulates digits for count prefix (e.g., "15" in "15gg")

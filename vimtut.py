@@ -163,18 +163,15 @@ class Vimtut:
             cmd.append(str(self.current_lesson_file))
             cmd.append(str(section2_file))
         # Special handling for marks lesson
-        # Pre-set marks at DELETE_THIS positions
+        # Pre-set marks at FIXME positions using explicit line/column
         elif lesson and lesson['id'] == 'marks':
             cmd.append(str(self.current_lesson_file))
-            # Execute commands to set marks at each DELETE_THIS occurrence
+            # Set marks at specific lines, column 8 (where FIXME starts)
+            # Line 5: FIXME in apples, Line 11: FIXME in bananas, Line 17: FIXME in cherries
             cmd.extend([
-                '-c', '/DELETE_THIS',  # Find first occurrence
-                '-c', 'normal! ma',     # Set mark a
-                '-c', 'silent! normal! n',  # Find next (silent to avoid error messages)
-                '-c', 'normal! mb',     # Set mark b
-                '-c', 'silent! normal! n',  # Find next
-                '-c', 'normal! mc',     # Set mark c
-                '-c', 'normal! gg',     # Go back to top
+                '-c 5normal! 9|ma',
+                '-c 11normal! 9|mb',
+                '-c 17normal! 9|mc',
             ])
         else:
             cmd.append(str(self.current_lesson_file))

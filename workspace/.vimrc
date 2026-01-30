@@ -77,6 +77,27 @@ function! SetupVimtut()
     setlocal wrap
     setlocal linebreak
 
+    " Add syntax highlighting for instructions
+    syntax clear
+    syntax match VimtutHeader /^LESSON:.*$/
+    syntax match VimtutSeparator /^=\+$/
+    syntax match VimtutTask /Your task:.*$/
+    syntax match VimtutSteps /^Steps:$/
+    syntax match VimtutStepNum /^\d\+\./
+    syntax match VimtutKeyCmd /'[^']\+'/
+    syntax match VimtutWarning /Note:.*$/
+    syntax match VimtutTip /Tip:.*$/
+
+    " Define colors for instruction elements
+    highlight VimtutHeader ctermfg=Cyan cterm=bold guifg=#00FFFF gui=bold
+    highlight VimtutSeparator ctermfg=DarkGray guifg=#666666
+    highlight VimtutTask ctermfg=Yellow cterm=bold guifg=#FFFF00 gui=bold
+    highlight VimtutSteps ctermfg=Green cterm=bold guifg=#00FF00 gui=bold
+    highlight VimtutStepNum ctermfg=Magenta guifg=#FF00FF
+    highlight VimtutKeyCmd ctermfg=Green guifg=#00FF00
+    highlight VimtutWarning ctermfg=Red guifg=#FF6666
+    highlight VimtutTip ctermfg=Cyan guifg=#66FFFF
+
     " Set a different status line for instructions
     setlocal statusline=\ INSTRUCTIONS\ (Read-Only)\ -\ Scroll\ with\ Ctrl+j\ then\ j/k
 

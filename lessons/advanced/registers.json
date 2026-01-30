@@ -1,9 +1,9 @@
 {
   "id": "registers",
-  "title": "Registers (\"a, \"b)",
-  "instruction_text": "Store multiple clipboards!\n\n'\"a' before yank/delete = use register 'a'\n'\"ayy' = yank line to register a\n'\"ap' = paste from register a\n'\"byy' = yank to register b\n':reg' = view all registers\n\nYour task: Copy BOTH words using different registers,\nthen paste them in order.\n\nSteps:\n1. Move to 'SECOND'\n2. Press '\"ayiw' (yank inner word to register a)\n3. Move to 'FIRST'\n4. Press '\"byiw' (yank inner word to register b)\n5. Move to 'Result:' line (press 'j')\n6. Press 'A' to append, type a space, press ESC\n7. Press '\"bp' (paste from register b = FIRST)\n8. Press 'a' to append, type a space, press ESC\n9. Press '\"ap' (paste from register a = SECOND)\n10. Save with :wq",
-  "setup_file": "SECOND\nFIRST\nResult:",
+  "title": "Registers (\"x, \"y)",
+  "instruction_text": "Vim has named registers - like multiple clipboards!\n\nKEY COMMANDS:\n'\"x' before yank/delete = use register 'x'\n'\"xyy' = yank line to register x\n'\"xp' = paste from register x\n':reg' = view all registers\n\nYour task: Copy two words to different registers,\nthen paste them on the Result line.\n\nSteps:\n1. Cursor starts on 'HELLO' - press '\"xyiw' to yank it to register x\n2. Press 'j' to move down to 'WORLD'\n3. Press '\"yyiw' to yank WORLD to register y\n4. Press 'j' to move to the Result line\n5. Press '$' to go to the end of the line\n6. Press '\"xp' to paste HELLO_ from register x\n7. Press '\"yp' to paste WORLD from register y\n8. :wq to save",
+  "setup_file": "HELLO_\nWORLD\nResult: ",
   "validation_type": "exact_match",
-  "target_content": "SECOND\nFIRST\nResult: FIRST SECOND",
+  "target_content": "HELLO_\nWORLD\nResult: HELLO_WORLD",
   "next_lesson": "find_replace"
 }

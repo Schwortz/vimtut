@@ -1,6 +1,9 @@
 " Vimtut Tutorial Configuration - VERTICAL SPLIT VERSION
 " This config is used for lesson 24 (marks) to show instructions on the right
 
+" Disable Vi compatibility mode (removes $ marker on change commands)
+set nocompatible
+
 " Show line numbers
 set number
 

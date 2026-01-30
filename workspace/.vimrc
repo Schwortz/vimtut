@@ -1,6 +1,9 @@
 " Vimtut Tutorial Configuration
 " This config is loaded during tutorial sessions
 
+" Disable Vi compatibility mode (removes $ marker on change commands)
+set nocompatible
+
 " Show line numbers
 set number
 

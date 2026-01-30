@@ -20,6 +20,10 @@ set showmode
 " Make backspace work as expected in insert mode
 set backspace=indent,eol,start
 
+" Indentation settings (for shift lesson)
+set shiftwidth=4
+set expandtab
+
 " Reduce startup messages
 set shortmess+=I    " Don't show intro message
 set shortmess+=F    " Don't show file info when editing

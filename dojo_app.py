@@ -564,6 +564,11 @@ class VimDojo:
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
+        # Calculate counts dynamically
+        total = len(self.lessons)
+        basic = len(self.basic_lessons)
+        advanced = len(self.advanced_lessons)
+
         # ASCII art celebration
         celebration = [
             "",
@@ -576,8 +581,8 @@ class VimDojo:
             "",
             "                🎉  YOU'VE MASTERED VIM!  🎉",
             "",
-            "           You've completed ALL 29 lessons!",
-            "              (22 Basic + 7 Advanced)",
+            f"           You've completed ALL {total} lessons!",
+            f"              ({basic} Basic + {advanced} Advanced)",
             "",
             "            You are now a true Vim master.",
             "          Go forth and edit with ultimate power!",

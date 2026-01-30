@@ -1,0 +1,9 @@
+{
+  "id": "shift_indent",
+  "title": "Shift/Indent (>>, <<)",
+  "instruction_text": "Indent and unindent lines!\n\n'>>' = indent current line (shift right)\n'<<' = unindent current line (shift left)\n'3>>' = indent 3 lines\nIn visual mode: '>' indents, '<' unindents\n\nYour task: Fix the indentation of this code.\n\nSteps:\n1. Move to 'echo \"inside\"' (line 2)\n2. Press '>>' to indent it\n3. Move to line 3 ('done')\n4. Press '>>' to indent it... wait, 'done' should NOT be indented!\n5. Press '<<' to unindent it back\n6. Save with :wq\n\nAlternative: Use '2>>' on line 2 to indent 2 lines at once.",
+  "setup_file": "while true; do\necho \"inside\"\ndone",
+  "validation_type": "exact_match",
+  "target_content": "while true; do\n    echo \"inside\"\ndone",
+  "next_lesson": "delete_to_end"
+}

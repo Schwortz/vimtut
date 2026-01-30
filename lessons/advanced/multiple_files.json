@@ -1,9 +1,10 @@
 {
-  "id": "24_multiple_files",
+  "id": "multiple_files",
   "title": "Multiple Files (:e, :bn, :bp)",
   "instruction_text": "Work with multiple files in Vim!\n\n':ls' = list all buffers (try this!)\n':bn' = next buffer\n':bp' = previous buffer\n':b filename' = switch to specific buffer\n\nYour task: Two files are open.\nSwitch to task2.txt and add 'COMPLETED' to it.\n\nSteps:\n1. Type ':ls' and press ENTER (see both files)\n2. Type ':bn' or ':b task2.txt' to switch to second file\n3. Press 'A' to append at end of line\n4. Type ' COMPLETED'\n5. Press ESC\n6. Type :wq to save and quit all buffers\n\nNote: Both files are already loaded!\nUse :bn to switch between them.",
   "setup_file": "This is the first file (current_task.txt)",
   "validation_type": "exact_match_file",
   "target_content": "This is the second file (task2.txt) COMPLETED",
-  "validation_file": "task2.txt"
+  "validation_file": "task2.txt",
+  "next_lesson": "split_windows"
 }

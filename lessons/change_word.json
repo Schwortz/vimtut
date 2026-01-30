@@ -1,8 +1,9 @@
 {
-  "id": "16_change_word",
+  "id": "change_word",
   "title": "Change Word (cw)",
   "instruction_text": "Delete a word AND enter insert mode in one command!\n\n'cw' = change word (delete word and enter insert mode)\n\nYour task: Replace 'slow' with 'quick' and 'blue' with 'brown'\n\nSteps:\n1. Move cursor to 's' in 'slow'\n2. Press 'cw'\n3. Type 'quick'\n4. Press ESC\n5. Use 'w' to jump to 'blue'\n6. Press 'cw'\n7. Type 'brown'\n8. Press ESC\n9. Save and quit with :wq",
   "setup_file": "The slow blue fox jumps",
   "validation_type": "exact_match",
-  "target_content": "The quick brown fox jumps"
+  "target_content": "The quick brown fox jumps",
+  "next_lesson": "visual_mode"
 }

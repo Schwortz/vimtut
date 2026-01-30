@@ -32,13 +32,46 @@ class VimDojo:
         self.current_mode = 'basic'  # 'basic' or 'advanced'
 
     def load_lessons(self, directory: Path, recursive: bool = False) -> List[Dict]:
-        """Load lesson configurations from a directory."""
-        lessons = []
+        """Load lesson configurations from a directory and order by next_lesson chain."""
+        # First, load all lessons into a dict by ID
+        lessons_by_id = {}
         pattern = "**/*.json" if recursive else "*.json"
-        for lesson_file in sorted(directory.glob(pattern)):
+        for lesson_file in directory.glob(pattern):
             with open(lesson_file, 'r') as f:
-                lessons.append(json.load(f))
-        return lessons
+                lesson = json.load(f)
+                lessons_by_id[lesson['id']] = lesson
+        
+        if not lessons_by_id:
+            return []
+        
+        # Find the first lesson (one that no other lesson points to)
+        all_ids = set(lessons_by_id.keys())
+        referenced_ids = {lesson.get('next_lesson') for lesson in lessons_by_id.values() if lesson.get('next_lesson')}
+        first_ids = all_ids - referenced_ids
+        
+        if not first_ids:
+            # Fallback: just return lessons in any order if chain is broken
+            return list(lessons_by_id.values())
+        
+        # Build ordered list by following the chain
+        ordered_lessons = []
+        current_id = first_ids.pop()  # Start with the first lesson
+        visited = set()
+        
+        while current_id and current_id in lessons_by_id:
+            if current_id in visited:
+                break  # Prevent infinite loops
+            visited.add(current_id)
+            lesson = lessons_by_id[current_id]
+            ordered_lessons.append(lesson)
+            current_id = lesson.get('next_lesson')
+        
+        # Add any lessons not in the chain (orphans) at the end
+        for lesson_id, lesson in lessons_by_id.items():
+            if lesson_id not in visited:
+                ordered_lessons.append(lesson)
+        
+        return ordered_lessons
 
     def get_lesson_by_id(self, lesson_id: str) -> Optional[Dict]:
         """Get a specific lesson by its ID."""
@@ -76,16 +109,16 @@ class VimDojo:
         # Store the initial modification time
         self.file_mtime_before = os.path.getmtime(self.current_lesson_file)
 
-        # Special setup for multiple files lesson (lesson 24)
-        if lesson['id'] == '24_multiple_files':
+        # Special setup for multiple files lesson
+        if lesson['id'] == 'multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             with open(task2_file, 'w') as f:
                 f.write("This is the second file (task2.txt)")
             # Store its mtime too for validation
             self.task2_mtime_before = os.path.getmtime(task2_file)
 
-        # Special setup for split windows lesson (lesson 25)
-        if lesson['id'] == '25_split_windows':
+        # Special setup for split windows lesson
+        if lesson['id'] == 'split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             with open(section2_file, 'w') as f:
                 f.write("=== TARGET FILE ===\n\nPassword: REPLACE_ME")
@@ -107,9 +140,9 @@ class VimDojo:
         # Save terminal state
         curses.endwin()
 
-        # Choose vimrc: use vertical split version for lesson 26 (marks)
+        # Choose vimrc: use vertical split version for marks lesson
         vimrc_to_use = self.vimrc_path
-        if lesson and lesson['id'] == '26_marks':
+        if lesson and lesson['id'] == 'marks':
             vimrc_to_use = self.workspace_dir / ".vimrc_vsplit"
 
         # Build command
@@ -118,21 +151,21 @@ class VimDojo:
             '-u', str(vimrc_to_use),
         ]
 
-        # Special handling for multiple files lesson (lesson 24)
+        # Special handling for multiple files lesson
         # Open both files so user can switch between them
-        if lesson and lesson['id'] == '24_multiple_files':
+        if lesson and lesson['id'] == 'multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             cmd.append(str(self.current_lesson_file))
             cmd.append(str(task2_file))
-        # Special handling for split windows lesson (lesson 25)
+        # Special handling for split windows lesson
         # Open both files but don't auto-split (user must split)
-        elif lesson and lesson['id'] == '25_split_windows':
+        elif lesson and lesson['id'] == 'split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             cmd.append(str(self.current_lesson_file))
             cmd.append(str(section2_file))
-        # Special handling for marks lesson (lesson 26)
+        # Special handling for marks lesson
         # Pre-set marks at DELETE_THIS positions
-        elif lesson and lesson['id'] == '26_marks':
+        elif lesson and lesson['id'] == 'marks':
             cmd.append(str(self.current_lesson_file))
             # Execute commands to set marks at each DELETE_THIS occurrence
             cmd.extend([
@@ -291,8 +324,12 @@ class VimDojo:
             completed = lesson['id'] in self.completed_lessons
             checkbox = "[x]" if completed else "[ ]"
 
-            # Get lesson number (extract from ID like "21_macros" -> 21)
-            lesson_num = int(lesson['id'].split('_')[0])
+            # Calculate lesson number based on position
+            # Basic: 1, 2, 3... Advanced: continues from basic (e.g., 23, 24, 25...)
+            if self.current_mode == 'basic':
+                lesson_num = idx + 1
+            else:
+                lesson_num = len(self.basic_lessons) + idx + 1
             prefix = f"{checkbox} {lesson_num}. "
             lesson_text = f"{prefix}{lesson['title']}"
 
@@ -398,13 +435,13 @@ class VimDojo:
     def cleanup_lesson(self, lesson: Dict):
         """Clean up any temporary files created for a lesson."""
         # Clean up task2.txt for multiple files lesson
-        if lesson['id'] == '24_multiple_files':
+        if lesson['id'] == 'multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             if task2_file.exists():
                 os.remove(task2_file)
 
         # Clean up section2.txt for split windows lesson
-        if lesson['id'] == '25_split_windows':
+        if lesson['id'] == 'split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             if section2_file.exists():
                 os.remove(section2_file)

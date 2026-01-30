@@ -1,8 +1,9 @@
 {
-  "id": "13_line_boundaries",
+  "id": "line_boundaries",
   "title": "Line Beginning/End (0, $)",
   "instruction_text": "Jump to line boundaries instantly!\n\n'0' = jump to start of line\n'$' = jump to end of line\n\nYour task: Add 'START ' at beginning and ' END' at end of each line\n\nSteps for first line:\n1. Press '0' to jump to start\n2. Press 'i' to insert\n3. Type 'START '\n4. Press ESC\n5. Press '$' to jump to end\n6. Press 'a' to append\n7. Type ' END'\n8. Press ESC\n9. Repeat for second line (press 'j' then '0')\n10. Save and quit with :wq",
   "setup_file": "middle text\nanother line",
   "validation_type": "exact_match",
-  "target_content": "START middle text END\nSTART another line END"
+  "target_content": "START middle text END\nSTART another line END",
+  "next_lesson": "search"
 }

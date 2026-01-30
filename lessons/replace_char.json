@@ -1,8 +1,9 @@
 {
-  "id": "15_replace_char",
+  "id": "replace_char",
   "title": "Replace Character (r)",
   "instruction_text": "Replace a single character without entering insert mode!\n\n'r' = replace character under cursor\n\nYour task: Fix the x's in the text.\n\nCurrent: \"Hxllo Wxrld\"\nGoal:    \"Hello World\"\n\nSteps:\n1. Move cursor to first 'x' (in 'Hxllo')\n2. Press 'r' then 'e'\n3. Move to second 'x' (in 'Wxrld')\n4. Press 'r' then 'o'\n5. Save and quit with :wq\n\nSuper fast for single character fixes!",
   "setup_file": "Hxllo Wxrld",
   "validation_type": "exact_match",
-  "target_content": "Hello World"
+  "target_content": "Hello World",
+  "next_lesson": "change_word"
 }

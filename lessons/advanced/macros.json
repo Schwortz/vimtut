@@ -1,8 +1,9 @@
 {
-  "id": "23_macros",
+  "id": "macros",
   "title": "Macros (q, @)",
   "instruction_text": "Record and replay sequences of commands!\n\n'q' followed by a letter = start recording to that register\n'q' again = stop recording\n'@' followed by letter = replay the macro\n'@@' = replay last macro\n\nYour task: Use a macro to add 'Item: ' before each number.\n\nSteps:\n1. Move to '1'\n2. Press 'qa' (start recording to register 'a')\n3. Press 'I' (insert at beginning of line)\n4. Type 'Item: '\n5. Press ESC\n6. Press 'j' (move to next line)\n7. Press 'q' (stop recording)\n8. Press '4@a' (replay macro 4 times for remaining lines)\n9. Save with :wq\n\nMacros are powerful for repetitive tasks!",
   "setup_file": "1\n2\n3\n4\n5",
   "validation_type": "exact_match",
-  "target_content": "Item: 1\nItem: 2\nItem: 3\nItem: 4\nItem: 5"
+  "target_content": "Item: 1\nItem: 2\nItem: 3\nItem: 4\nItem: 5",
+  "next_lesson": "multiple_files"
 }

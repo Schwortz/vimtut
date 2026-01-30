@@ -1,8 +1,9 @@
 {
-  "id": "12_find_character",
+  "id": "find_character",
   "title": "Find Character (f, t)",
   "instruction_text": "Jump to any character on the current line!\n\n'f{char}' = find char (cursor ON the character)\n't{char}' = till char (cursor BEFORE the character)\n';' = repeat last f/t forward\n',' = repeat last f/t backward\n\nYour task: Remove all commas from the text.\n\nSteps:\n1. Press 'f,' to jump to first comma\n2. Press 'x' to delete it\n3. Press ';' to jump to next comma\n4. Press '.' to repeat the deletion\n5. Repeat ';' then '.' for remaining commas\n6. Save with :wq\n\nTip: 'df,' deletes through comma, 'dt,' deletes up to comma.",
   "setup_file": "one, two, three, four, five",
   "validation_type": "exact_match",
-  "target_content": "one two three four five"
+  "target_content": "one two three four five",
+  "next_lesson": "line_boundaries"
 }

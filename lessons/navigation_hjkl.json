@@ -1,8 +1,9 @@
 {
-  "id": "02_navigation_hjkl",
+  "id": "navigation_hjkl",
   "title": "Basic Navigation (hjkl)",
   "instruction_text": "Welcome to Vim's core navigation keys!\n\nIn Vim, you move the cursor using:\n  h = left\n  j = down\n  k = up\n  l = right\n\nYour task: Navigate to the letter 'M' in the center\nand delete it using the 'x' key.\n\nSteps:\n1. Use h,j,k,l to move to the 'M'\n2. Press 'x' to delete it\n3. Save and quit with :wq",
   "setup_file": "A B C D E\nF G H I J\nK L M N O\nP Q R S T",
   "validation_type": "exact_match",
-  "target_content": "A B C D E\nF G H I J\nK L  N O\nP Q R S T"
+  "target_content": "A B C D E\nF G H I J\nK L  N O\nP Q R S T",
+  "next_lesson": "insert_mode"
 }

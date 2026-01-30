@@ -1,8 +1,9 @@
 {
-  "id": "19_delete_to_end",
+  "id": "delete_to_end",
   "title": "Delete to End of Line (D)",
   "instruction_text": "Delete from cursor to end of line!\n\n'D' = delete from cursor to end of line\n'd$' = same thing ($ means end of line)\n\nYour task: Remove unwanted text from end of lines.\n\nSteps:\n1. Move cursor to 'R' in 'REMOVE THIS' (first line)\n2. Press 'D'\n3. Move to second line (press 'j')\n4. Move cursor to 'D' in 'DELETE THIS'\n5. Press 'D'\n6. Save and quit with :wq",
   "setup_file": "Good text REMOVE THIS\nAnother line DELETE THIS",
   "validation_type": "exact_match",
-  "target_content": "Good text \nAnother line "
+  "target_content": "Good text \nAnother line ",
+  "next_lesson": "join_lines"
 }

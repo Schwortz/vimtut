@@ -1,8 +1,9 @@
 {
-  "id": "11_word_movement",
+  "id": "word_movement",
   "title": "Word Movement (w, b, e)",
   "instruction_text": "Navigate by words, not just characters!\n\n'w' = jump to start of next word\n'b' = jump back to start of previous word\n'e' = jump to end of word\n\nYour task: Delete the word 'fast' from the sentence.\n\nSteps:\n1. Press 'w' multiple times to jump to 'fast'\n2. When cursor is on 'f' of 'fast', press 'dw'\n   (dw = delete word)\n3. Save and quit with :wq\n\nMuch faster than using 'l' repeatedly!",
   "setup_file": "The quick brown fast fox jumps over the lazy dog",
   "validation_type": "exact_match",
-  "target_content": "The quick brown fox jumps over the lazy dog"
+  "target_content": "The quick brown fox jumps over the lazy dog",
+  "next_lesson": "find_character"
 }

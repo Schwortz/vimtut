@@ -1,9 +1,10 @@
 {
-  "id": "25_split_windows",
+  "id": "split_windows",
   "title": "Split Windows (:split, :vsplit)",
   "instruction_text": "View multiple files side-by-side!\n\n':vsplit' or ':vsp' = vertical split (side-by-side)\n'Ctrl+w w' = switch between split windows\n'Ctrl+w q' = close current split window\n\nYour task: section1.txt has a SECRET CODE.\nYou need to copy it to section2.txt (replace REPLACE_ME).\n\nSteps:\n1. Type ':vsplit section2.txt' (or ':vsp section2.txt')\n2. Both files now visible side-by-side!\n3. Look at section1.txt to see the SECRET CODE\n4. Switch to section2.txt (Ctrl+w w)\n5. Navigate to 'REPLACE_ME'\n6. Press 'cw' and type the SECRET CODE you see\n7. Press ESC, then :wq\n\nThis is WHY splits are useful - reference while editing!",
   "setup_file": "=== REFERENCE FILE ===\n\nSECRET CODE: VimMaster$^&@\n\nCopy this exact code to section2.txt",
   "validation_type": "exact_match_file",
   "target_content": "=== TARGET FILE ===\n\nPassword: VimMaster$^&@",
-  "validation_file": "section2.txt"
+  "validation_file": "section2.txt",
+  "next_lesson": "marks"
 }

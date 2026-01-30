@@ -24,7 +24,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_02_navigation_delete_m(self):
         """Test lesson 2 - deleting 'M' produces correct output."""
-        lesson = self.dojo.get_lesson_by_id("02_navigation_hjkl")
+        lesson = self.dojo.get_lesson_by_id("navigation_hjkl")
         self.assertIsNotNone(lesson)
 
         # Simulate the task: delete 'M' from the setup file
@@ -43,7 +43,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_03_insert_brown(self):
         """Test lesson 3 - inserting 'brown' is correct."""
-        lesson = self.dojo.get_lesson_by_id("03_insert_mode")
+        lesson = self.dojo.get_lesson_by_id("insert_mode")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -54,7 +54,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_06_delete_extra_letters(self):
         """Test lesson 6 - deleting extra letters."""
-        lesson = self.dojo.get_lesson_by_id("06_delete_char")
+        lesson = self.dojo.get_lesson_by_id("delete_char")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -65,7 +65,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_07_delete_lines(self):
         """Test lesson 7 - deleting specific lines."""
-        lesson = self.dojo.get_lesson_by_id("07_delete_line")
+        lesson = self.dojo.get_lesson_by_id("delete_line")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -87,7 +87,7 @@ class TestLessonContent(unittest.TestCase):
     def test_all_lessons_have_required_fields(self):
         """Ensure all lessons have required fields."""
         required_fields = ['id', 'title', 'instruction_text', 'setup_file',
-                          'validation_type', 'target_content']
+                          'validation_type', 'target_content', 'next_lesson']
 
         for lesson in self.dojo.lessons:
             for field in required_fields:

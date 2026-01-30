@@ -1,14 +1,14 @@
-# Vim Dojo
+# Vimtut
 
 An interactive TUI application that teaches Vim through hands-on lessons.
 
-**27 Total Lessons:**
-- 20 Basic Lessons (fundamentals)
+**32 Total Lessons:**
+- 25 Basic Lessons (fundamentals)
 - 7 Advanced Lessons (power-user features) - unlocked after basics!
 
 ## Architecture
 
-Vim Dojo follows a "wrapper loop" pattern:
+Vimtut follows a "wrapper loop" pattern:
 
 1. **Briefing (TUI)**: Quick overview before launching Vim
 2. **Action (Vim)**: Launches real Vim with split-screen instructions
@@ -29,9 +29,11 @@ Instructions appear **inside Vim** as a bottom split pane:
 
 ```
 vimtut/
-├── dojo_app.py      # Main TUI application
+├── vimtut.py        # Main TUI application
 ├── lessons/         # Lesson configurations (JSON)
-│   └── 01_the_exit.json
+│   ├── the_exit.json
+│   ├── navigation_hjkl.json
+│   └── ...          # Lessons linked via next_lesson field
 ├── workspace/       # User workspace
 │   ├── .vimrc       # Custom Vim config for tutorials
 │   └── current_task.txt  # Working file
@@ -69,13 +71,13 @@ This shows byte-by-byte comparison of expected vs actual content.
 Run the tutorial:
 
 ```bash
-./dojo_app.py
+./vimtut.py
 ```
 
 Or:
 
 ```bash
-python3 dojo_app.py
+python3 vimtut.py
 ```
 
 ## Controls
@@ -106,9 +108,12 @@ Create a new JSON file in the `lessons/` directory:
   "instruction_text": "Instructions for the user",
   "setup_file": "Initial file content",
   "validation_type": "exact_match|file_saved|contains",
-  "target_content": "Expected result"
+  "target_content": "Expected result",
+  "next_lesson": "next_lesson_id"
 }
 ```
+
+Lessons are ordered via linked list - each lesson's `next_lesson` points to the next one.
 
 ### Validation Types
 

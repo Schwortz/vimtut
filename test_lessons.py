@@ -10,9 +10,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Import the VimDojo class
+# Import the Vimtut class
 sys.path.insert(0, os.path.dirname(__file__))
-from dojo_app import VimDojo
+from vimtut import Vimtut
 
 
 class TestLessonContent(unittest.TestCase):
@@ -20,11 +20,11 @@ class TestLessonContent(unittest.TestCase):
 
     def setUp(self):
         """Load all lessons."""
-        self.dojo = VimDojo()
+        self.vimtut = Vimtut()
 
     def test_lesson_02_navigation_delete_m(self):
         """Test lesson 2 - deleting 'M' produces correct output."""
-        lesson = self.dojo.get_lesson_by_id("navigation_hjkl")
+        lesson = self.vimtut.get_lesson_by_id("navigation_hjkl")
         self.assertIsNotNone(lesson)
 
         # Simulate the task: delete 'M' from the setup file
@@ -43,7 +43,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_03_insert_brown(self):
         """Test lesson 3 - inserting 'brown' is correct."""
-        lesson = self.dojo.get_lesson_by_id("insert_mode")
+        lesson = self.vimtut.get_lesson_by_id("insert_mode")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -54,7 +54,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_06_delete_extra_letters(self):
         """Test lesson 6 - deleting extra letters."""
-        lesson = self.dojo.get_lesson_by_id("delete_char")
+        lesson = self.vimtut.get_lesson_by_id("delete_char")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -65,7 +65,7 @@ class TestLessonContent(unittest.TestCase):
 
     def test_lesson_07_delete_lines(self):
         """Test lesson 7 - deleting specific lines."""
-        lesson = self.dojo.get_lesson_by_id("delete_line")
+        lesson = self.vimtut.get_lesson_by_id("delete_line")
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -89,7 +89,7 @@ class TestLessonContent(unittest.TestCase):
         required_fields = ['id', 'title', 'instruction_text', 'setup_file',
                           'validation_type', 'target_content', 'next_lesson']
 
-        for lesson in self.dojo.lessons:
+        for lesson in self.vimtut.lessons:
             for field in required_fields:
                 self.assertIn(field, lesson,
                              f"Lesson {lesson.get('id', 'unknown')} missing field: {field}")
@@ -98,7 +98,7 @@ class TestLessonContent(unittest.TestCase):
         """Ensure all lessons use valid validation types."""
         valid_types = ['file_saved', 'exact_match', 'contains', 'exact_match_file']
 
-        for lesson in self.dojo.lessons:
+        for lesson in self.vimtut.lessons:
             validation_type = lesson.get('validation_type')
             self.assertIn(validation_type, valid_types,
                          f"Lesson {lesson['id']} has invalid validation_type: {validation_type}")
@@ -109,7 +109,7 @@ class TestLessonLinkedList(unittest.TestCase):
 
     def setUp(self):
         """Load all lessons."""
-        self.dojo = VimDojo()
+        self.vimtut = Vimtut()
 
     def _load_all_lessons_raw(self, directory):
         """Load all lesson files from a directory into a dict by ID."""
@@ -177,30 +177,30 @@ class TestLessonLinkedList(unittest.TestCase):
 
     def test_basic_lessons_chain_valid(self):
         """Test that basic lessons form a valid linked list."""
-        lessons_by_id = self._load_all_lessons_raw(self.dojo.lessons_dir)
+        lessons_by_id = self._load_all_lessons_raw(self.vimtut.lessons_dir)
         self._validate_chain(lessons_by_id, "Basic lessons")
 
     def test_advanced_lessons_chain_valid(self):
         """Test that advanced lessons form a valid linked list."""
-        if not self.dojo.advanced_dir.exists():
+        if not self.vimtut.advanced_dir.exists():
             self.skipTest("No advanced lessons directory")
-        lessons_by_id = self._load_all_lessons_raw(self.dojo.advanced_dir)
+        lessons_by_id = self._load_all_lessons_raw(self.vimtut.advanced_dir)
         self._validate_chain(lessons_by_id, "Advanced lessons")
 
     def test_no_cross_chain_references(self):
         """Test that basic and advanced chains don't reference each other."""
-        basic_ids = {lesson['id'] for lesson in self.dojo.basic_lessons}
-        advanced_ids = {lesson['id'] for lesson in self.dojo.advanced_lessons}
+        basic_ids = {lesson['id'] for lesson in self.vimtut.basic_lessons}
+        advanced_ids = {lesson['id'] for lesson in self.vimtut.advanced_lessons}
 
         # Check basic lessons don't point to advanced lessons
-        for lesson in self.dojo.basic_lessons:
+        for lesson in self.vimtut.basic_lessons:
             next_id = lesson.get('next_lesson')
             if next_id:
                 self.assertNotIn(next_id, advanced_ids,
                     f"Basic lesson '{lesson['id']}' points to advanced lesson '{next_id}'")
 
         # Check advanced lessons don't point to basic lessons
-        for lesson in self.dojo.advanced_lessons:
+        for lesson in self.vimtut.advanced_lessons:
             next_id = lesson.get('next_lesson')
             if next_id:
                 self.assertNotIn(next_id, basic_ids,
@@ -209,24 +209,24 @@ class TestLessonLinkedList(unittest.TestCase):
     def test_chains_end_with_null(self):
         """Test that each chain ends with a lesson where next_lesson is null."""
         # Check basic chain
-        if self.dojo.basic_lessons:
-            last_basic = self.dojo.basic_lessons[-1]
+        if self.vimtut.basic_lessons:
+            last_basic = self.vimtut.basic_lessons[-1]
             self.assertIsNone(last_basic.get('next_lesson'),
                 f"Last basic lesson '{last_basic['id']}' should have next_lesson=null, "
                 f"but has '{last_basic.get('next_lesson')}'")
 
         # Check advanced chain
-        if self.dojo.advanced_lessons:
-            last_advanced = self.dojo.advanced_lessons[-1]
+        if self.vimtut.advanced_lessons:
+            last_advanced = self.vimtut.advanced_lessons[-1]
             self.assertIsNone(last_advanced.get('next_lesson'),
                 f"Last advanced lesson '{last_advanced['id']}' should have next_lesson=null, "
                 f"but has '{last_advanced.get('next_lesson')}'")
 
     def test_all_next_lesson_references_exist(self):
         """Test that every next_lesson reference points to an existing lesson."""
-        all_ids = {lesson['id'] for lesson in self.dojo.lessons}
+        all_ids = {lesson['id'] for lesson in self.vimtut.lessons}
 
-        for lesson in self.dojo.lessons:
+        for lesson in self.vimtut.lessons:
             next_id = lesson.get('next_lesson')
             if next_id is not None:
                 self.assertIn(next_id, all_ids,

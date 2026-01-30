@@ -1,4 +1,4 @@
-" Vim Dojo Tutorial Configuration
+" Vimtut Tutorial Configuration
 " This config is loaded during tutorial sessions
 
 " Show line numbers
@@ -12,7 +12,7 @@ syntax on
 
 " Set status line to show lesson info
 set laststatus=2
-set statusline=\ VIM\ DOJO\ \|\ Press\ ESC\ then\ :wq\ to\ save\ and\ quit
+set statusline=\ VIMTUT\ \|\ Press\ ESC\ then\ :wq\ to\ save\ and\ quit
 
 " Show the current mode (INSERT, VISUAL, etc.)
 set showmode
@@ -29,13 +29,13 @@ set shortmess+=I    " Don't show intro message
 set shortmess+=F    " Don't show file info when editing
 
 " Create split view with instructions on startup
-augroup VimDojoSetup
+augroup VimtutSetup
   autocmd!
-  autocmd VimEnter * call SetupVimDojo()
+  autocmd VimEnter * call SetupVimtut()
 augroup END
 
 function! DojoQuit(save)
-  " Custom quit function for Vim Dojo
+  " Custom quit function for Vimtut
   " a:save = 1 means save before quit (:wq), 0 means just quit (:q)
   if a:save
     " Save current file first
@@ -45,7 +45,7 @@ function! DojoQuit(save)
   qall
 endfunction
 
-function! SetupVimDojo()
+function! SetupVimtut()
   " Save the current file name (the task file)
   let l:task_file = expand('%:p')
   let l:instructions_file = expand('%:p:h') . '/instructions.txt'

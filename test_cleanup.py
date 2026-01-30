@@ -6,21 +6,21 @@ Test that lesson 22 cleanup works
 import sys
 import os
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 
 def test_cleanup():
     """Test that task2.txt is cleaned up after lesson."""
-    dojo = VimDojo()
-    lesson = dojo.get_lesson_by_id("22_multiple_files")
+    vimtut = Vimtut()
+    lesson = vimtut.get_lesson_by_id("22_multiple_files")
 
     print("Testing lesson 22 cleanup...")
     print()
 
     # Setup
     print("1. Setting up lesson...")
-    dojo.setup_lesson(lesson)
+    vimtut.setup_lesson(lesson)
 
-    task2_path = dojo.workspace_dir / "task2.txt"
+    task2_path = vimtut.workspace_dir / "task2.txt"
 
     # Check file exists
     if task2_path.exists():
@@ -32,7 +32,7 @@ def test_cleanup():
     # Run cleanup
     print()
     print("2. Running cleanup...")
-    dojo.cleanup_lesson(lesson)
+    vimtut.cleanup_lesson(lesson)
 
     # Check file deleted
     if not task2_path.exists():
@@ -44,7 +44,7 @@ def test_cleanup():
     print("3. Testing cleanup is automatic in run_lesson...")
 
     # Setup again
-    dojo.setup_lesson(lesson)
+    vimtut.setup_lesson(lesson)
 
     if task2_path.exists():
         print("   ✓ task2.txt created again")
@@ -56,7 +56,7 @@ def test_cleanup():
     # The cleanup should happen in finally block
     # We can't easily test the full run_lesson without TUI
     # But we can test cleanup directly
-    dojo.cleanup_lesson(lesson)
+    vimtut.cleanup_lesson(lesson)
 
     if not task2_path.exists():
         print("   ✓ task2.txt cleaned up after completion")

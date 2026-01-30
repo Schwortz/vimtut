@@ -5,13 +5,13 @@ Test lesson 23 (split windows) functionality
 
 import sys
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 import os
 
 def test_lesson_23():
     """Test that lesson 23 properly creates and validates section2.txt."""
-    dojo = VimDojo()
-    lesson = dojo.get_lesson_by_id("23_split_windows")
+    vimtut = Vimtut()
+    lesson = vimtut.get_lesson_by_id("23_split_windows")
 
     print("=" * 60)
     print("TESTING LESSON 23: Split Windows")
@@ -19,12 +19,12 @@ def test_lesson_23():
 
     # Setup
     print("\n1. Setting up lesson...")
-    dojo.setup_lesson(lesson)
+    vimtut.setup_lesson(lesson)
 
     # Check files created
     print("\n2. Checking files in workspace...")
-    task1 = dojo.workspace_dir / "current_task.txt"
-    section2 = dojo.workspace_dir / "section2.txt"
+    task1 = vimtut.workspace_dir / "current_task.txt"
+    section2 = vimtut.workspace_dir / "section2.txt"
 
     if task1.exists():
         with open(task1, 'r') as f:
@@ -42,7 +42,7 @@ def test_lesson_23():
 
     # Test validation - before editing
     print("\n3. Testing validation BEFORE editing section2.txt...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     if not success:
         print(f"   Message: {message.split(chr(10))[0]}")
@@ -55,13 +55,13 @@ def test_lesson_23():
 
     # Test validation - after editing
     print("\n5. Testing validation AFTER editing section2.txt...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     print(f"   Message: {message}")
 
     # Test cleanup
     print("\n6. Testing cleanup...")
-    dojo.cleanup_lesson(lesson)
+    vimtut.cleanup_lesson(lesson)
     if not section2.exists():
         print("   ✓ section2.txt cleaned up")
     else:

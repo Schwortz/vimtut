@@ -6,11 +6,11 @@ Test the completion celebration screen
 import sys
 import curses
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 
 def show_celebration_preview(stdscr):
     """Preview the celebration screens."""
-    dojo = VimDojo()
+    vimtut = Vimtut()
 
     # Show instructions
     stdscr.clear()
@@ -22,7 +22,7 @@ def show_celebration_preview(stdscr):
     stdscr.getch()
 
     # Show advanced unlock
-    dojo.show_advanced_unlock(stdscr)
+    vimtut.show_advanced_unlock(stdscr)
 
     # Transition message
     stdscr.clear()
@@ -34,7 +34,7 @@ def show_celebration_preview(stdscr):
     stdscr.getch()
 
     # Show ultimate celebration
-    dojo.show_completion_celebration(stdscr)
+    vimtut.show_completion_celebration(stdscr)
 
 if __name__ == '__main__':
     print("Launching celebration preview...")

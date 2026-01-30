@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Vim Dojo - Interactive Vim Tutorial
+Vimtut - Interactive Vim Tutorial
 A TUI wrapper that teaches Vim through hands-on lessons
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 
-class VimDojo:
+class Vimtut:
     def __init__(self):
         self.base_dir = Path(__file__).parent
         self.lessons_dir = self.base_dir / "lessons"
@@ -308,7 +308,7 @@ class VimDojo:
 
         # Title
         mode_title = "BASIC" if self.current_mode == 'basic' else "ADVANCED"
-        title = f"[ VIM DOJO - {mode_title} LESSONS ]"
+        title = f"[ VIMTUT - {mode_title} LESSONS ]"
         stdscr.addstr(0, (width - len(title)) // 2, title, curses.A_BOLD)
 
         # Progress bar for current mode
@@ -609,21 +609,21 @@ class VimDojo:
         stdscr.getch()
 
     def run(self):
-        """Start the Vim Dojo application."""
+        """Start the Vimtut application."""
         curses.wrapper(self.main_loop)
 
 
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Vim Dojo - Interactive Vim Tutorial',
+        description='Vimtut - Interactive Vim Tutorial',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  ./dojo_app.py                  Run normally
-  ./dojo_app.py --progress 5     Fake completion of first 5 lessons
-  ./dojo_app.py --progress 20    Fake completion of all 20 lessons (see celebration!)
-  ./dojo_app.py --reset          Reset all progress
+  ./vimtut.py                  Run normally
+  ./vimtut.py --progress 5     Fake completion of first 5 lessons
+  ./vimtut.py --progress 25    Fake completion of all basic lessons
+  ./vimtut.py --reset          Reset all progress
         """
     )
     parser.add_argument(
@@ -645,15 +645,15 @@ Examples:
         result = subprocess.run(['which', 'vim'], capture_output=True)
         if result.returncode != 0:
             print("Error: Vim is not installed or not in PATH.")
-            print("Please install Vim to use Vim Dojo.")
+            print("Please install Vim to use Vimtut.")
             sys.exit(1)
 
-    dojo = VimDojo()
+    vimtut = Vimtut()
 
     # Handle --reset flag
     if args.reset:
-        if dojo.progress_file.exists():
-            os.remove(dojo.progress_file)
+        if vimtut.progress_file.exists():
+            os.remove(vimtut.progress_file)
             print("✓ Progress reset! All lessons marked as incomplete.")
         else:
             print("✓ No progress file found. Starting fresh.")
@@ -665,25 +665,25 @@ Examples:
         if n < 0:
             print(f"Error: --progress value must be positive (got {n})")
             sys.exit(1)
-        if n > len(dojo.lessons):
-            print(f"Warning: --progress {n} exceeds total lessons ({len(dojo.lessons)})")
-            print(f"Setting progress to {len(dojo.lessons)} instead.")
-            n = len(dojo.lessons)
+        if n > len(vimtut.lessons):
+            print(f"Warning: --progress {n} exceeds total lessons ({len(vimtut.lessons)})")
+            print(f"Setting progress to {len(vimtut.lessons)} instead.")
+            n = len(vimtut.lessons)
 
         # Mark first N lessons as complete
-        dojo.completed_lessons = set(lesson['id'] for lesson in dojo.lessons[:n])
-        dojo.save_progress()
+        vimtut.completed_lessons = set(lesson['id'] for lesson in vimtut.lessons[:n])
+        vimtut.save_progress()
 
         print(f"✓ Faked completion of first {n} lessons!")
-        print(f"  Progress: {n}/{len(dojo.lessons)} ({int((n/len(dojo.lessons))*100)}%)")
+        print(f"  Progress: {n}/{len(vimtut.lessons)} ({int((n/len(vimtut.lessons))*100)}%)")
 
-        if n == len(dojo.lessons):
+        if n == len(vimtut.lessons):
             print("\n🎉 All lessons marked complete! Launch the app to see the celebration!")
 
         sys.exit(0)
 
     # Run normally
-    dojo.run()
+    vimtut.run()
 
 
 if __name__ == "__main__":

@@ -5,13 +5,13 @@ Test lesson 24 (marks) functionality
 
 import sys
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 import os
 
 def test_lesson_24():
     """Test that lesson 24 properly creates a long file and validates mark usage."""
-    dojo = VimDojo()
-    lesson = dojo.get_lesson_by_id("24_marks")
+    vimtut = Vimtut()
+    lesson = vimtut.get_lesson_by_id("24_marks")
 
     print("=" * 60)
     print("TESTING LESSON 24: Marks")
@@ -19,11 +19,11 @@ def test_lesson_24():
 
     # Setup
     print("\n1. Setting up lesson...")
-    dojo.setup_lesson(lesson)
+    vimtut.setup_lesson(lesson)
 
     # Check file created
     print("\n2. Checking file in workspace...")
-    task_file = dojo.workspace_dir / "current_task.txt"
+    task_file = vimtut.workspace_dir / "current_task.txt"
 
     if task_file.exists():
         with open(task_file, 'r') as f:
@@ -47,7 +47,7 @@ def test_lesson_24():
 
     # Test validation - before editing
     print("\n3. Testing validation BEFORE removing DELETE_THIS...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     if not success:
         print(f"   Message: {message.split(chr(10))[0]}")
@@ -69,7 +69,7 @@ def test_lesson_24():
 
     # Test validation - after editing
     print("\n5. Testing validation AFTER removing DELETE_THIS...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     if success:
         print(f"   Message: {message}")
@@ -83,7 +83,7 @@ def test_lesson_24():
 
     # Test cleanup
     print("\n6. Testing cleanup...")
-    dojo.cleanup_lesson(lesson)
+    vimtut.cleanup_lesson(lesson)
     print("   ✓ Cleanup completed")
 
     print("\n" + "=" * 60)

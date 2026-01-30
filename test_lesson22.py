@@ -5,13 +5,13 @@ Test lesson 22 (multiple files) functionality
 
 import sys
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 import os
 
 def test_lesson_22():
     """Test that lesson 22 properly creates and validates second file."""
-    dojo = VimDojo()
-    lesson = dojo.get_lesson_by_id("22_multiple_files")
+    vimtut = Vimtut()
+    lesson = vimtut.get_lesson_by_id("22_multiple_files")
 
     print("=" * 60)
     print("TESTING LESSON 22: Multiple Files")
@@ -19,12 +19,12 @@ def test_lesson_22():
 
     # Setup
     print("\n1. Setting up lesson...")
-    dojo.setup_lesson(lesson)
+    vimtut.setup_lesson(lesson)
 
     # Check files created
     print("\n2. Checking files in workspace...")
-    task1 = dojo.workspace_dir / "current_task.txt"
-    task2 = dojo.workspace_dir / "task2.txt"
+    task1 = vimtut.workspace_dir / "current_task.txt"
+    task2 = vimtut.workspace_dir / "task2.txt"
 
     if task1.exists():
         with open(task1, 'r') as f:
@@ -42,7 +42,7 @@ def test_lesson_22():
 
     # Test validation - before editing
     print("\n3. Testing validation BEFORE editing task2.txt...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     if not success:
         print(f"   Message: {message.split(chr(10))[0]}")  # First line only
@@ -55,7 +55,7 @@ def test_lesson_22():
 
     # Test validation - after editing
     print("\n5. Testing validation AFTER editing task2.txt...")
-    success, message = dojo.validate_lesson(lesson)
+    success, message = vimtut.validate_lesson(lesson)
     print(f"   Result: {'✓ PASS' if success else '✗ FAIL'}")
     print(f"   Message: {message}")
 

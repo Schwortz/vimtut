@@ -3,19 +3,19 @@
 
 import sys
 sys.path.insert(0, '.')
-from dojo_app import VimDojo
+from vimtut import Vimtut
 
-# Create a dojo instance
-dojo = VimDojo()
+# Create a vimtut instance
+vimtut = Vimtut()
 
 # Get lesson 2
-lesson = dojo.get_lesson_by_id("02_navigation_hjkl")
+lesson = vimtut.get_lesson_by_id("02_navigation_hjkl")
 
 # The file currently has M still there
-dojo.current_lesson_file = dojo.workspace_dir / "current_task.txt"
+vimtut.current_lesson_file = vimtut.workspace_dir / "current_task.txt"
 
 # Run validation
-success, message = dojo.validate_lesson(lesson)
+success, message = vimtut.validate_lesson(lesson)
 
 print("Success:", success)
 print("\nError Message:")

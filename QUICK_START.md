@@ -5,7 +5,7 @@
 ```bash
 git clone <repo-url>
 cd vimtut
-chmod +x dojo_app.py
+chmod +x vimtut.py
 ```
 
 ## Requirements
@@ -16,7 +16,7 @@ chmod +x dojo_app.py
 ## Launch
 
 ```bash
-./dojo_app.py
+./vimtut.py
 ```
 
 ## Learning Path
@@ -61,18 +61,18 @@ Unlock after completing basics:
 ### Skip to Specific Lesson
 ```bash
 # Complete first 10 lessons
-./dojo_app.py --progress 10
+./vimtut.py --progress 10
 
 # Complete all basics (unlock advanced)
-./dojo_app.py --progress 20
+./vimtut.py --progress 20
 
 # Complete everything
-./dojo_app.py --progress 27
+./vimtut.py --progress 27
 ```
 
 ### Reset Progress
 ```bash
-./dojo_app.py --reset
+./vimtut.py --reset
 ```
 
 ### Preview Celebrations
@@ -124,7 +124,7 @@ Your progress is saved automatically in `progress.json`:
 
 ## Your First Session
 
-1. Launch: `./dojo_app.py`
+1. Launch: `./vimtut.py`
 2. Press ENTER on "The Exit"
 3. Follow instructions in bottom pane
 4. Type `:wq` and press ENTER

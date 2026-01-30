@@ -10,6 +10,10 @@ set cursorline
 " Enable syntax highlighting
 syntax on
 
+" Disable alternate screen buffer switching
+" The app manages the alternate screen, so Vim stays in the same buffer
+set t_ti= t_te=
+
 " Set status line to show lesson info
 set laststatus=2
 set statusline=\ VIMTUT\ \|\ Press\ ESC\ then\ :wq\ to\ save\ and\ quit

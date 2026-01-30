@@ -137,8 +137,7 @@ class Vimtut:
 
     def launch_vim(self, lesson: Dict = None):
         """Launch Vim with the tutorial configuration."""
-        # Save terminal state
-        curses.endwin()
+        curses.reset_shell_mode()
 
         # Choose vimrc: use vertical split version for marks lesson
         vimrc_to_use = self.vimrc_path
@@ -184,10 +183,11 @@ class Vimtut:
         subprocess.run(cmd, cwd=str(self.workspace_dir))
 
         # Restore curses
+        curses.reset_prog_mode()
         stdscr = curses.initscr()
-        curses.noecho()
-        curses.cbreak()
         stdscr.keypad(True)
+        stdscr.clear()
+        stdscr.refresh()
 
         return stdscr
 

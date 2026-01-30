@@ -84,7 +84,8 @@ function! SetupVimtut()
     syntax match VimtutTask /Your task:.*$/
     syntax match VimtutSteps /^Steps:$/
     syntax match VimtutStepNum /^\d\+\./
-    syntax match VimtutKeyCmd /'[^']\+'/
+    syntax match VimtutQuote /'/
+    syntax match VimtutKeyCmd /'\@<=[^']\+'\@=/
     syntax match VimtutWarning /Note:.*$/
     syntax match VimtutTip /Tip:.*$/
 
@@ -94,7 +95,8 @@ function! SetupVimtut()
     highlight VimtutTask ctermfg=Yellow cterm=bold guifg=#FFFF00 gui=bold
     highlight VimtutSteps ctermfg=Green cterm=bold guifg=#00FF00 gui=bold
     highlight VimtutStepNum ctermfg=Magenta guifg=#FF00FF
-    highlight VimtutKeyCmd ctermfg=Green guifg=#00FF00
+    highlight VimtutQuote ctermfg=DarkGray guifg=#888888
+    highlight VimtutKeyCmd ctermfg=Green cterm=bold guifg=#00FF00 gui=bold
     highlight VimtutWarning ctermfg=Red guifg=#FF6666
     highlight VimtutTip ctermfg=Cyan guifg=#66FFFF
 

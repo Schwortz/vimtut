@@ -10,8 +10,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Import the Vimtut class
-sys.path.insert(0, os.path.dirname(__file__))
+# Import the Vimtut class from parent directory
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from vimtut import Vimtut
 
 
@@ -233,24 +233,5 @@ class TestLessonLinkedList(unittest.TestCase):
                     f"Lesson '{lesson['id']}' references non-existent next_lesson '{next_id}'")
 
 
-def run_tests():
-    """Run all lesson tests."""
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    suite.addTests(loader.loadTestsFromTestCase(TestLessonContent))
-    suite.addTests(loader.loadTestsFromTestCase(TestLessonLinkedList))
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    return result.wasSuccessful()
-
-
 if __name__ == '__main__':
-    print("Testing lesson content and structure...\n")
-    success = run_tests()
-
-    if success:
-        print("\n✅ All lesson tests passed!")
-    else:
-        print("\n❌ Some lesson tests failed!")
-
-    sys.exit(0 if success else 1)
+    unittest.main(verbosity=2)

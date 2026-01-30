@@ -11,8 +11,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Import the Vimtut class
-sys.path.insert(0, os.path.dirname(__file__))
+# Import the Vimtut class from parent directory
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from vimtut import Vimtut
 
 
@@ -192,25 +192,15 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertIn('validation_type', first_lesson)
         self.assertIn('instruction_text', first_lesson)
 
-    def test_lesson_01_structure(self):
-        """Test that lesson 01 (The Exit) has correct structure."""
+    def test_lesson_the_exit_structure(self):
+        """Test that the first lesson (The Exit) has correct structure."""
         vimtut = Vimtut()
-        lesson = vimtut.get_lesson_by_id("01_the_exit")
+        lesson = vimtut.get_lesson_by_id("the_exit")
 
-        self.assertIsNotNone(lesson, "Lesson 01 should exist")
+        self.assertIsNotNone(lesson, "Lesson 'the_exit' should exist")
         self.assertEqual(lesson['validation_type'], 'file_saved')
         self.assertEqual(lesson['setup_file'], '')
 
 
-def run_tests():
-    """Run all tests with verbose output."""
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestVimtutValidation)
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    return result.wasSuccessful()
-
-
 if __name__ == '__main__':
-    success = run_tests()
-    sys.exit(0 if success else 1)
+    unittest.main(verbosity=2)

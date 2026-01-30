@@ -1,5 +1,5 @@
 {
-  "id": "16_visual_mode",
+  "id": "17_visual_mode",
   "title": "Visual Mode (v)",
   "instruction_text": "Select text visually before operating on it!\n\n'v' = enter visual mode (character selection)\n'h,j,k,l' = extend selection\n'd' = delete selection\n'y' = yank (copy) selection\n\nYour task: Delete the bracketed text.\n\nSteps:\n1. Move cursor to '['\n2. Press 'v' to enter visual mode\n3. Press 'l' repeatedly to select '[DELETE THIS PART]'\n4. Press 'd' to delete the selection\n5. Save and quit with :wq",
   "setup_file": "Keep this [DELETE THIS PART] and this",

@@ -1,0 +1,8 @@
+{
+  "id": "22_repeat_command",
+  "title": "Repeat Last Change (.)",
+  "instruction_text": "The '.' command repeats your last change - a HUGE time saver!\n\nAny edit (delete, change, insert) can be repeated with '.'\n\nYour task: Remove 'TODO ' from each line.\n\nSteps:\n1. Move cursor to 'T' in first 'TODO '\n2. Press 'dw' (delete word - removes 'TODO ')\n3. Press 'j' to move to next line\n4. Press '.' to repeat the deletion\n5. Press 'j' then '.' again for the last line\n6. Save with :wq\n\nWithout '.': dw, j, dw, j, dw (9 keys)\nWith '.':    dw, j, ., j, . (7 keys)\n\nThe more repetitions, the bigger the savings!",
+  "setup_file": "TODO fix the bug\nTODO update docs\nTODO add tests",
+  "validation_type": "exact_match",
+  "target_content": "fix the bug\nupdate docs\nadd tests"
+}

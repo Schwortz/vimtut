@@ -76,16 +76,16 @@ class VimDojo:
         # Store the initial modification time
         self.file_mtime_before = os.path.getmtime(self.current_lesson_file)
 
-        # Special setup for multiple files lesson (lesson 22)
-        if lesson['id'] == '22_multiple_files':
+        # Special setup for multiple files lesson (lesson 24)
+        if lesson['id'] == '24_multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             with open(task2_file, 'w') as f:
                 f.write("This is the second file (task2.txt)")
             # Store its mtime too for validation
             self.task2_mtime_before = os.path.getmtime(task2_file)
 
-        # Special setup for split windows lesson (lesson 23)
-        if lesson['id'] == '23_split_windows':
+        # Special setup for split windows lesson (lesson 25)
+        if lesson['id'] == '25_split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             with open(section2_file, 'w') as f:
                 f.write("=== TARGET FILE ===\n\nPassword: REPLACE_ME")
@@ -107,9 +107,9 @@ class VimDojo:
         # Save terminal state
         curses.endwin()
 
-        # Choose vimrc: use vertical split version for lesson 24
+        # Choose vimrc: use vertical split version for lesson 26 (marks)
         vimrc_to_use = self.vimrc_path
-        if lesson and lesson['id'] == '24_marks':
+        if lesson and lesson['id'] == '26_marks':
             vimrc_to_use = self.workspace_dir / ".vimrc_vsplit"
 
         # Build command
@@ -118,21 +118,21 @@ class VimDojo:
             '-u', str(vimrc_to_use),
         ]
 
-        # Special handling for multiple files lesson (lesson 22)
+        # Special handling for multiple files lesson (lesson 24)
         # Open both files so user can switch between them
-        if lesson and lesson['id'] == '22_multiple_files':
+        if lesson and lesson['id'] == '24_multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             cmd.append(str(self.current_lesson_file))
             cmd.append(str(task2_file))
-        # Special handling for split windows lesson (lesson 23)
+        # Special handling for split windows lesson (lesson 25)
         # Open both files but don't auto-split (user must split)
-        elif lesson and lesson['id'] == '23_split_windows':
+        elif lesson and lesson['id'] == '25_split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             cmd.append(str(self.current_lesson_file))
             cmd.append(str(section2_file))
-        # Special handling for marks lesson (lesson 24)
+        # Special handling for marks lesson (lesson 26)
         # Pre-set marks at DELETE_THIS positions
-        elif lesson and lesson['id'] == '24_marks':
+        elif lesson and lesson['id'] == '26_marks':
             cmd.append(str(self.current_lesson_file))
             # Execute commands to set marks at each DELETE_THIS occurrence
             cmd.extend([
@@ -398,13 +398,13 @@ class VimDojo:
     def cleanup_lesson(self, lesson: Dict):
         """Clean up any temporary files created for a lesson."""
         # Clean up task2.txt for multiple files lesson
-        if lesson['id'] == '22_multiple_files':
+        if lesson['id'] == '24_multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
             if task2_file.exists():
                 os.remove(task2_file)
 
         # Clean up section2.txt for split windows lesson
-        if lesson['id'] == '23_split_windows':
+        if lesson['id'] == '25_split_windows':
             section2_file = self.workspace_dir / "section2.txt"
             if section2_file.exists():
                 os.remove(section2_file)
@@ -539,8 +539,8 @@ class VimDojo:
             "",
             "                🎉  YOU'VE MASTERED VIM!  🎉",
             "",
-            "           You've completed ALL 27 lessons!",
-            "              (20 Basic + 7 Advanced)",
+            "           You've completed ALL 29 lessons!",
+            "              (22 Basic + 7 Advanced)",
             "",
             "            You are now a true Vim master.",
             "          Go forth and edit with ultimate power!",

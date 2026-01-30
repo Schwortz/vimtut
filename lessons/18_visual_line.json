@@ -1,5 +1,5 @@
 {
-  "id": "17_visual_line",
+  "id": "18_visual_line",
   "title": "Visual Line Mode (V)",
   "instruction_text": "Select entire lines at once!\n\n'V' = enter visual line mode (capital V)\n'j/k' = select more lines\n'd' = delete selected lines\n\nYour task: Delete the two 'Delete' lines.\n\nSteps:\n1. Move cursor to 'Delete line A'\n2. Press 'V' (capital V) to enter visual line mode\n3. Press 'j' to extend selection to include 'Delete line B'\n4. Press 'd' to delete both lines\n5. Save and quit with :wq",
   "setup_file": "Keep line 1\nDelete line A\nDelete line B\nKeep line 2",

@@ -1,5 +1,5 @@
 {
-  "id": "26_find_replace",
+  "id": "28_find_replace",
   "title": "Find and Replace (:%s/old/new/g)",
   "instruction_text": "Replace text throughout the entire file!\n\n':%s/old/new/g' = replace all 'old' with 'new'\n':%s/old/new/gc' = replace with confirmation\n':s/old/new/g' = replace on current line only\n':%s/old/new/' = replace first occurrence per line\n\nYour task: Replace all occurrences of 'cat' with 'dog'.\n\nSteps:\n1. Press ':' to enter command mode\n2. Type '%s/cat/dog/g'\n3. Press ENTER\n4. All 'cat' should change to 'dog'\n5. Save with :wq\n\nThis is one of Vim's most powerful features!",
   "setup_file": "The cat sat on the mat.\nAnother cat walked by.\nA third cat appeared.\ncat cat cat",

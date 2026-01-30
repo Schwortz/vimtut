@@ -1,5 +1,5 @@
 {
-  "id": "13_search",
+  "id": "14_search",
   "title": "Search Forward (/)",
   "instruction_text": "Find text quickly with search!\n\n'/' = start search\n'n' = jump to next match\n'N' = jump to previous match\n\nYour task: Delete the last 'apple' in the line.\n\nSteps:\n1. Press '/'\n2. Type 'apple'\n3. Press ENTER (jumps to first 'apple')\n4. Press 'n' to jump to next match\n5. Press 'n' again to jump to the last 'apple'\n6. Press 'dw' to delete the word\n7. Save and quit with :wq",
   "setup_file": "apple orange apple banana apple grape",

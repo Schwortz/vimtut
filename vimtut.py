@@ -2,6 +2,9 @@
 """
 Vimtut - Interactive Vim Tutorial
 A TUI wrapper that teaches Vim through hands-on lessons
+
+Usage: python3 vimtut.py [--help]
+Lessons live in the lessons/ directory; progress is saved to progress.json.
 """
 
 import os

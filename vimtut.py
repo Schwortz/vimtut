@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""
-Vimtut - Interactive Vim Tutorial
-A TUI wrapper that teaches Vim through hands-on lessons
+"""Vimtut - Interactive Vim Tutorial.
+
+A TUI wrapper that teaches Vim through hands-on lessons.
+
+Typical usage:
+    ./vimtut.py [--progress N] [--reset]
 """
 
 import os
@@ -12,11 +15,37 @@ import subprocess
 import time
 import argparse
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any
 
 
 class Vimtut:
-    def __init__(self):
+    """Interactive Vim tutorial application.
+
+    Loads lesson definitions, tracks user progress, launches Vim for each
+    lesson, validates the result, and renders the curses user interface.
+
+    Attributes:
+        base_dir: Directory containing this script.
+        lessons_dir: Directory holding the basic lesson JSON files.
+        advanced_dir: Directory holding the advanced lesson JSON files.
+        workspace_dir: Directory where lesson files are written for Vim.
+        vimrc_path: Path of the vimrc used when launching Vim.
+        current_lesson_file: Path of the file the user edits.
+        progress_file: Path of the JSON file storing user progress.
+        basic_lessons: Ordered list of basic lessons.
+        advanced_lessons: Ordered list of advanced lessons.
+        lessons: Basic and advanced lessons combined.
+        completed_lessons: Set of completed lesson IDs.
+        welcome_seen: Whether the welcome screen has been shown.
+        current_mode: Either 'basic' or 'advanced'.
+        file_mtime_before: Modification time of the lesson file at setup
+            (set by setup_lesson).
+        task2_mtime_before: Modification time of task2.txt at setup (set by
+            setup_lesson for the multiple files lesson).
+    """
+
+    def __init__(self) -> None:
+        """Initialize paths, load lessons, and load saved progress."""
         self.base_dir = Path(__file__).parent
         self.lessons_dir = self.base_dir / "lessons"
         self.advanced_dir = self.lessons_dir / "advanced"
@@ -31,8 +60,17 @@ class Vimtut:
         self.completed_lessons, self.welcome_seen = self.load_progress()
         self.current_mode = 'basic'  # 'basic' or 'advanced'
 
-    def load_lessons(self, directory: Path, recursive: bool = False) -> List[Dict]:
-        """Load lesson configurations from a directory and order by next_lesson chain."""
+    def load_lessons(self, directory: Path, recursive: bool = False) -> list[dict[str, Any]]:
+        """Load lesson configurations from a directory and order by next_lesson chain.
+
+        Args:
+            directory: Directory containing lesson JSON files.
+            recursive: Whether to search subdirectories as well.
+
+        Returns:
+            Lessons ordered by following the ``next_lesson`` chain, with any
+            orphaned lessons appended at the end.
+        """
         # First, load all lessons into a dict by ID
         lessons_by_id = {}
         pattern = "**/*.json" if recursive else "*.json"
@@ -73,15 +111,27 @@ class Vimtut:
         
         return ordered_lessons
 
-    def get_lesson_by_id(self, lesson_id: str) -> Optional[Dict]:
-        """Get a specific lesson by its ID."""
+    def get_lesson_by_id(self, lesson_id: str) -> dict[str, Any] | None:
+        """Get a specific lesson by its ID.
+
+        Args:
+            lesson_id: The ID of the lesson to find.
+
+        Returns:
+            The matching lesson, or None if no lesson has that ID.
+        """
         for lesson in self.lessons:
             if lesson['id'] == lesson_id:
                 return lesson
         return None
 
-    def load_progress(self) -> tuple:
-        """Load user progress from file. Returns (completed_lessons, welcome_seen)."""
+    def load_progress(self) -> tuple[set[str], bool]:
+        """Load user progress from file.
+
+        Returns:
+            A tuple of (completed_lessons, welcome_seen). Defaults to an empty
+            set and False if the file is missing or unreadable.
+        """
         if self.progress_file.exists():
             try:
                 with open(self.progress_file, 'r') as f:
@@ -91,7 +141,7 @@ class Vimtut:
                 return set(), False
         return set(), False
 
-    def save_progress(self):
+    def save_progress(self) -> None:
         """Save user progress to file."""
         data = {
             'completed_lessons': list(self.completed_lessons),
@@ -102,8 +152,12 @@ class Vimtut:
         with open(self.progress_file, 'w') as f:
             json.dump(data, f, indent=2)
 
-    def setup_lesson(self, lesson: Dict):
-        """Prepare the workspace for a lesson."""
+    def setup_lesson(self, lesson: dict[str, Any]) -> None:
+        """Prepare the workspace for a lesson.
+
+        Args:
+            lesson: The lesson configuration to set up.
+        """
         # Write the starting file content
         with open(self.current_lesson_file, 'w') as f:
             f.write(lesson['setup_file'])
@@ -136,8 +190,15 @@ class Vimtut:
                 f.write("This pane is READ-ONLY. Edit in the pane above.\n")
                 f.write("=" * 70 + "\n")  # Add trailing newline to avoid "Incomplete last line"
 
-    def launch_vim(self, lesson: Dict = None):
-        """Launch Vim with the tutorial configuration."""
+    def launch_vim(self, lesson: dict[str, Any] | None = None) -> curses.window:
+        """Launch Vim with the tutorial configuration.
+
+        Args:
+            lesson: The lesson being run, used to choose vimrc and files.
+
+        Returns:
+            The re-initialized curses standard screen after Vim exits.
+        """
         curses.reset_shell_mode()
 
         # Choose vimrc: use vertical split version for marks lesson
@@ -189,8 +250,15 @@ class Vimtut:
 
         return stdscr
 
-    def validate_lesson(self, lesson: Dict) -> tuple[bool, str]:
-        """Validate if the user completed the lesson correctly."""
+    def validate_lesson(self, lesson: dict[str, Any]) -> tuple[bool, str]:
+        """Validate if the user completed the lesson correctly.
+
+        Args:
+            lesson: The lesson configuration, including its validation type.
+
+        Returns:
+            A tuple of (success, message) describing the validation outcome.
+        """
         validation_type = lesson['validation_type']
 
         if validation_type == 'exact_match_file':
@@ -292,12 +360,23 @@ class Vimtut:
         return False, "Unknown validation type"
 
     def all_basic_lessons_complete(self) -> bool:
-        """Check if all basic lessons are completed."""
+        """Check if all basic lessons are completed.
+
+        Returns:
+            True if every basic lesson ID is in the completed set.
+        """
         basic_ids = set(lesson['id'] for lesson in self.basic_lessons)
         return basic_ids.issubset(self.completed_lessons)
 
-    def draw_menu(self, stdscr, selected_idx: int, count_buffer: str = "", pending_g: bool = False):
-        """Draw the main lesson menu."""
+    def draw_menu(self, stdscr: curses.window, selected_idx: int, count_buffer: str = "", pending_g: bool = False) -> None:
+        """Draw the main lesson menu.
+
+        Args:
+            stdscr: The curses window to draw on.
+            selected_idx: Index of the currently highlighted lesson.
+            count_buffer: Digits typed so far for a count prefix.
+            pending_g: Whether a first 'g' keypress is awaiting a second.
+        """
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
@@ -359,9 +438,16 @@ class Vimtut:
 
         stdscr.refresh()
 
-    def draw_briefing(self, stdscr, lesson: Dict) -> bool:
+    def draw_briefing(self, stdscr: curses.window, lesson: dict[str, Any]) -> bool:
         """Display lesson briefing before launching Vim.
-        Returns True to continue, False to abort."""
+
+        Args:
+            stdscr: The curses window to draw on.
+            lesson: The lesson being briefed.
+
+        Returns:
+            True to continue, False to abort.
+        """
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
@@ -400,9 +486,17 @@ class Vimtut:
             return False
         return True
 
-    def draw_debrief(self, stdscr, success: bool, message: str) -> bool:
+    def draw_debrief(self, stdscr: curses.window, success: bool, message: str) -> bool:
         """Display lesson results after validation.
-        Returns True to retry, False to return to menu."""
+
+        Args:
+            stdscr: The curses window to draw on.
+            success: Whether the lesson was completed successfully.
+            message: The validation message to display.
+
+        Returns:
+            True to retry, False to return to menu.
+        """
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
@@ -437,8 +531,12 @@ class Vimtut:
             return False
         return True
 
-    def cleanup_lesson(self, lesson: Dict):
-        """Clean up any temporary files created for a lesson."""
+    def cleanup_lesson(self, lesson: dict[str, Any]) -> None:
+        """Clean up any temporary files created for a lesson.
+
+        Args:
+            lesson: The lesson whose temporary files should be removed.
+        """
         # Clean up task2.txt for multiple files lesson
         if lesson['id'] == 'multiple_files':
             task2_file = self.workspace_dir / "task2.txt"
@@ -451,8 +549,13 @@ class Vimtut:
             if section2_file.exists():
                 os.remove(section2_file)
 
-    def run_lesson(self, stdscr, lesson: Dict):
-        """Execute the full lesson cycle: vim -> verification -> debrief."""
+    def run_lesson(self, stdscr: curses.window, lesson: dict[str, Any]) -> None:
+        """Execute the full lesson cycle: vim -> verification -> debrief.
+
+        Args:
+            stdscr: The curses window used for the debrief screens.
+            lesson: The lesson to run.
+        """
         try:
             while True:
                 # 1. Setup and launch Vim directly (no briefing screen)
@@ -486,12 +589,19 @@ class Vimtut:
             # Always clean up lesson files
             self.cleanup_lesson(lesson)
 
-    def handle_goto_key(self, key: int, count_buffer: str, pending_g: bool, max_idx: int) -> tuple:
+    def handle_goto_key(self, key: int, count_buffer: str, pending_g: bool, max_idx: int) -> tuple[bool, str, bool, int | None]:
         """Handle Vim-style goto line input (gg, G, {N}gg, {N}G).
-        
-        Returns: (handled, new_count_buffer, new_pending_g, target_idx or None)
-        - handled: True if this key was consumed by goto logic
-        - target_idx: The line to jump to, or None if no jump yet
+
+        Args:
+            key: The keycode that was pressed.
+            count_buffer: Digits accumulated so far for a count prefix.
+            pending_g: Whether a first 'g' is awaiting a second.
+            max_idx: The highest valid lesson index.
+
+        Returns:
+            A tuple of (handled, new_count_buffer, new_pending_g, target_idx).
+            ``handled`` is True if this key was consumed by goto logic, and
+            ``target_idx`` is the line to jump to, or None if no jump yet.
         """
         # Handle digit input (0-9) - accumulate for count prefix
         if ord('0') <= key <= ord('9'):
@@ -526,8 +636,12 @@ class Vimtut:
         # Key not handled by goto logic - clear state
         return (False, "", False, None)
 
-    def show_welcome_screen(self, stdscr):
-        """Show welcome screen on first launch. User must type :begin to continue."""
+    def show_welcome_screen(self, stdscr: curses.window) -> None:
+        """Show welcome screen on first launch. User must type :begin to continue.
+
+        Args:
+            stdscr: The curses window to draw on.
+        """
         curses.curs_set(1)  # Show cursor for typing
         stdscr.keypad(True)
         
@@ -621,8 +735,12 @@ class Vimtut:
             elif 32 <= key <= 126:  # Printable characters
                 input_buffer += chr(key)
 
-    def main_loop(self, stdscr):
-        """Main TUI loop."""
+    def main_loop(self, stdscr: curses.window) -> None:
+        """Run the main TUI loop.
+
+        Args:
+            stdscr: The curses window provided by ``curses.wrapper``.
+        """
         curses.curs_set(0)
         stdscr.keypad(True)
         
@@ -672,8 +790,12 @@ class Vimtut:
                     lesson = current_lessons[selected_idx]
                     self.run_lesson(stdscr, lesson)
 
-    def show_advanced_unlock(self, stdscr):
-        """Show message when advanced lessons are unlocked."""
+    def show_advanced_unlock(self, stdscr: curses.window) -> None:
+        """Show message when advanced lessons are unlocked.
+
+        Args:
+            stdscr: The curses window to draw on.
+        """
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
@@ -734,8 +856,12 @@ class Vimtut:
         stdscr.refresh()
         stdscr.getch()
 
-    def show_completion_celebration(self, stdscr):
-        """Show a celebration screen when all lessons are complete."""
+    def show_completion_celebration(self, stdscr: curses.window) -> None:
+        """Show a celebration screen when all lessons are complete.
+
+        Args:
+            stdscr: The curses window to draw on.
+        """
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
@@ -797,12 +923,17 @@ class Vimtut:
         stdscr.refresh()
         stdscr.getch()
 
-    def run(self):
+    def run(self) -> None:
         """Start the Vimtut application."""
         curses.wrapper(self.main_loop)
 
 
-def main():
+def main() -> None:
+    """Parse command-line arguments and run Vimtut.
+
+    Handles the ``--reset`` and ``--progress`` flags, verifies that Vim is
+    installed, and otherwise starts the interactive application.
+    """
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description='Vimtut - Interactive Vim Tutorial',

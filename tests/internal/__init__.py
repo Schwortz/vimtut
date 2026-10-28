@@ -1,1 +1,1 @@
-# Internal test modules
+"""Internal unit test modules for Vimtut."""

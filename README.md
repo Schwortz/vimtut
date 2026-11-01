@@ -80,7 +80,7 @@ Or, without the executable bit:
 python3 vimtut.py
 ```
 
-Pick a lesson from the main menu (see [Controls](#controls)); lessons unlock in order, with the advanced set available after the basics.
+Pick a lesson from the main menu (see [Controls](#controls)); all basic lessons are available at any time, and the advanced set unlocks once every basic lesson is complete.
 
 ## Controls
 

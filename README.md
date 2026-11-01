@@ -68,17 +68,19 @@ This shows byte-by-byte comparison of expected vs actual content.
 
 ## Usage
 
-Run the tutorial:
+Make sure Vim is installed and on your `PATH`, then run the tutorial from the `vimtut/` directory:
 
 ```bash
 ./vimtut.py
 ```
 
-Or:
+Or, without the executable bit:
 
 ```bash
 python3 vimtut.py
 ```
+
+Pick a lesson from the main menu (see [Controls](#controls)); lessons unlock in order, with the advanced set available after the basics.
 
 ## Controls
 

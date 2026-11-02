@@ -66,6 +66,14 @@ python3 debug_validation.py
 
 This shows byte-by-byte comparison of expected vs actual content.
 
+## Quick Start
+
+1. Launch with `./vimtut.py` and pick a lesson from the menu.
+2. Follow the instructions in the bottom pane inside Vim.
+3. Finish with `:wq`, or abort with `:q!` (see [Controls](#controls)).
+
+New here? See [QUICK_START.md](QUICK_START.md).
+
 ## Usage
 
 Run the tutorial:

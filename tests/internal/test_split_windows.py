@@ -48,7 +48,7 @@ class TestSplitWindowsLesson(unittest.TestCase):
 
         section2 = self.vimtut.workspace_dir / "section2.txt"
         with open(section2, 'w') as f:
-            f.write("=== TARGET FILE ===\n\nPassword: VimMaster$^&@")
+            f.write("=== TARGET FILE ===\n\nPassword: VimMaster123")
 
         success, message = self.vimtut.validate_lesson(self.lesson)
         self.assertTrue(success, f"Validation should pass after correct edit: {message}")

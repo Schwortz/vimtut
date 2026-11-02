@@ -26,7 +26,7 @@ class TestMarksLesson(unittest.TestCase):
         self.vimtut.cleanup_lesson(self.lesson)
 
     def test_setup_creates_file_with_markers(self):
-        """Test that setup creates a file with DELETE_THIS markers."""
+        """Test that setup creates a file with FIXME markers."""
         self.vimtut.setup_lesson(self.lesson)
 
         task_file = self.vimtut.workspace_dir / "current_task.txt"
@@ -35,32 +35,32 @@ class TestMarksLesson(unittest.TestCase):
         with open(task_file, 'r') as f:
             content = f.read()
 
-        delete_count = content.count('DELETE_THIS')
-        self.assertEqual(delete_count, 3, f"Should have 3 DELETE_THIS markers, found {delete_count}")
+        delete_count = content.count('FIXME')
+        self.assertEqual(delete_count, 3, f"Should have 3 FIXME markers, found {delete_count}")
 
     def test_validation_fails_before_edit(self):
-        """Test that validation fails before DELETE_THIS words are removed."""
+        """Test that validation fails before FIXME words are removed."""
         self.vimtut.setup_lesson(self.lesson)
 
         success, message = self.vimtut.validate_lesson(self.lesson)
-        self.assertFalse(success, "Validation should fail before removing DELETE_THIS")
+        self.assertFalse(success, "Validation should fail before removing FIXME")
 
     def test_validation_passes_after_edit(self):
-        """Test that validation passes after DELETE_THIS words are removed."""
+        """Test that validation passes after FIXME words are removed."""
         self.vimtut.setup_lesson(self.lesson)
 
         task_file = self.vimtut.workspace_dir / "current_task.txt"
         with open(task_file, 'r') as f:
             content = f.read()
 
-        # Remove all DELETE_THIS occurrences
-        content_cleaned = content.replace('DELETE_THIS ', '')
+        # Remove all FIXME occurrences
+        content_cleaned = content.replace('FIXME ', '')
 
         with open(task_file, 'w') as f:
             f.write(content_cleaned)
 
         success, message = self.vimtut.validate_lesson(self.lesson)
-        self.assertTrue(success, f"Validation should pass after removing DELETE_THIS: {message}")
+        self.assertTrue(success, f"Validation should pass after removing FIXME: {message}")
 
 
 if __name__ == '__main__':
